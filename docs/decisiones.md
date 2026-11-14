@@ -22,7 +22,7 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 4 | **Supabase gratis, São Paulo** | Postgres + Auth + RLS, y el MCP oficial deja que Claude consulte con SQL. | Cloudflare D1: sin MCP equivalente para analizar datos. | caro |
 | 5 | **Auth con email y contraseña de Supabase** | Los refresh tokens no vencen en el plan gratuito: se entra una vez. RLS nativo con `auth.uid()`. | Magic link: abre Safari, no la PWA. Token de dispositivo propio: reimplementa Supabase con más superficie de error. | barato |
 | 6 | **Cloudflare Workers con static assets, en `*.workers.dev`** | Gratis, sin límite de requests estáticos; el MCP remoto (fase 7) vive en el mismo lugar. Dominio común: sin costo. | Vercel: también sirve. Dominio propio: Gonza no quiere pagar. | barato antes de instalar; después, cambiar de dominio es reinstalar |
-| 7 | **GitHub Actions: tipos, lint, tests y build antes del deploy** | Una rutina inválida nunca llega al teléfono. | Deploy por integración git sin chequeos. | barato |
+| 7 | **CI en GitHub Actions; deploy con Cloudflare Workers Builds, que corre el mismo `npm run verify` antes de publicar** | Una rutina inválida nunca llega al teléfono, y no hace falta guardar un token de Cloudflare en GitHub. | Deploy desde Actions con `wrangler-action`: suma un secreto para el mismo resultado. | barato |
 | 8 | **Biome** | Una herramienta y una config para lint y formato. | ESLint + Prettier: más piezas para el mismo resultado. | barato |
 | 9 | **Vitest + Playwright WebKit para 2 o 3 flujos críticos** | El dominio se prueba en unidades; offline y recarga se prueban con un browser parecido a Safari. | Solo pruebas manuales en el iPhone. | barato |
 
@@ -62,6 +62,15 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 29 | **Carga tardía con fecha pasada** | Decisión de Gonza: si un día no anotó, lo carga después. Obliga a que la rotación y la semana se calculen con la fecha de cada sesión. | Solo editar sesiones existentes. | barato |
 | 30 | **Test de banca: aviso en Upper A de la semana 5; el orden de la sesión es libre** | El PDF lo pide en la última semana cargada; el orden libre ya permite hacer la banca primero. | Reordenar la sesión sola. | barato |
 
+## Fase 1 (14/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 31 | **El repo va en la cuenta personal de GitHub, por SSH con una clave y un alias propios** | En esta Mac ya está logueada otra cuenta (`gruiz-flyingheads`); el alias `github-gym` aísla la personal sin tocar la otra. | Token HTTPS en el llavero. | barato |
+| 32 | **Actualización con aviso (`registerType: 'prompt'`), sin recarga automática** | Una recarga a mitad de una serie sería un mal momento; se aplica cuando Gonza toca Actualizar. | `autoUpdate`. | barato |
+| 33 | **Paleta de Tailwind borrada: solo existen los tokens del diseño** | "Cero hex sueltos" lo verifica el compilador de clases, no la revisión. | Convivir con la paleta default. | barato |
+| 34 | **Versiones al día: Vite 8, TypeScript 7, React Router 8, Vitest 5** | Proyecto nuevo: arrancar en lo vigente evita una migración apenas empieza. | Versiones anteriores "probadas". | medio |
+
 ## Pendiente
-- **Cuenta de GitHub para el repo:** se pueden usar varias cuentas en la misma máquina.
-  Gonza tiene que decir cuál.
+- **Usuario de la cuenta personal de GitHub** y el repo vacío `gym` creado ahí.
+- **Conectar Cloudflare Workers Builds** al repo (lo hace Gonza desde el dashboard).
