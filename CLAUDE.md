@@ -16,7 +16,8 @@ pará y preguntá.
 - **Fase 0, lienzos:** [Gym · Lienzos](https://claude.ai/artifact/JjepiWviYnpoD3prTXjbmP).
   Aprobados por Gonza el 14/11/2026. Después se agregaron la unidad por ejercicio,
   terminar con pendientes y la carga tardía.
-- Todavía no hay código, repo remoto ni deploy. Falta saber qué cuenta de GitHub usar.
+- **Fase 1 (rama `fase-1`, PR a `main`):** base de la PWA, CI y config de deploy. Repo en
+  `gruizmdq/gym`; Cloudflare Workers Builds conectado. Falta mergear y probar en el iPhone.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -32,10 +33,32 @@ pará y preguntá.
 | 8 | Push al terminar el descanso (opcional) | — |
 
 ## Stack
-Vite + React 19 + TypeScript strict + Tailwind v4 + React Router · Dexie 4 con
-`useLiveQuery` (sin store global) · vite-plugin-pwa · Supabase (Postgres, Auth, RLS;
+Vite 8 + React 19 + TypeScript 7 (strict) + Tailwind v4 + React Router 8 · Dexie 4 con
+`useLiveQuery` (sin store global) · vite-plugin-pwa 2 · Supabase (Postgres, Auth, RLS;
 región São Paulo) · Cloudflare Workers con static assets en `*.workers.dev` · GitHub
 Actions · Biome · Vitest + Playwright (WebKit).
+
+## Comandos
+- `npm run dev` (:5173) · `npm run preview` (:4173: sirve `dist/` con el service worker).
+- `npm run verify`: lint (Biome) + tests (Vitest) + build (`tsc -b` + Vite). Es exactamente
+  lo que corren CI y el deploy: si pasa local, pasa allá.
+- `npm run format`: Biome con `--write`. Biome no toca los `.md`.
+- `npm run icons`: regenera íconos y splash desde `public/icon.svg`
+  (`pwa-assets.config.ts`). El generador imprime links con `-light-` en el nombre, pero los
+  archivos no lo tienen: en `index.html` van los nombres reales.
+- Node 24 (`.node-version`). `.npmrc` guarda versiones exactas: las actualizaciones son
+  explícitas.
+
+## Deploy
+- Cloudflare Workers con static assets (`wrangler.jsonc`), en `gym.<subdominio>.workers.dev`.
+  Workers Builds está conectado al repo: cada push a `main` corre `npm run verify` y, si
+  pasa, `npx wrangler deploy`. No hay tokens de Cloudflare en GitHub.
+- GitHub Actions corre `npm run verify` en cada PR y en `main`.
+- `public/_headers`: `/assets/*` inmutable; `sw.js` e `index.html` sin caché.
+- **Las versiones nuevas nunca recargan solas:** el service worker nuevo espera y la app
+  muestra "Hay una versión nueva" hasta que se toca Actualizar. Además se busca versión
+  nueva cada vez que la app vuelve a primer plano.
+- La versión que está corriendo (commit corto) se ve en Ajustes.
 
 ## Arquitectura: reglas duras
 - **La UI solo habla con Dexie. El único que habla con Supabase es el sync.** Nada de
@@ -143,6 +166,10 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - **El teclado decimal en es-AR trae coma:** el parseo acepta `62,5` y `62.5`. Mostrar con
   `Intl.NumberFormat('es-AR')`.
 - **Inputs con `font-size` ≥ 16 px**, o iOS hace zoom.
+- **Barra de estado en modo claro:** `apple-mobile-web-app-status-bar-style` va en `default`.
+  Con `black-translucent` el texto de la hora queda blanco sobre fondo claro.
+- **Los títulos no saltan entre pestañas:** `Pagina` reserva siempre la línea del
+  antetítulo, aunque esté vacía.
 - **Wake Lock se libera al ocultarse la app:** volver a pedirlo en `visibilitychange`.
 - **Supabase gratis pausa el proyecto tras 7 días sin actividad.** Se reactiva desde el
   dashboard; la app sigue andando sin conexión.
@@ -173,5 +200,9 @@ Actions · Biome · Vitest + Playwright (WebKit).
 
 ## Flujo de trabajo
 - Una rama por fase, desde `main`, y un PR que mergea Gonza.
+- El repo vive en la cuenta **personal** de GitHub. El remoto usa el alias SSH `github-gym`
+  (`git@github-gym:gruizmdq/gym.git`, clave `~/.ssh/id_ed25519_gym`). La otra cuenta
+  configurada en esta Mac (`gruiz-flyingheads`, también la del conector de GitHub) no se
+  usa en este repo.
 - Commits atómicos. `main` despliega solo si pasan los tipos, el lint, los tests y el build.
 - Nunca reescribir historia (rebase, reset --hard, amend, push --force).
