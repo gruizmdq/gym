@@ -72,5 +72,5 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 34 | **Versiones al día: Vite 8, TypeScript 7, React Router 8, Vitest 5** | Proyecto nuevo: arrancar en lo vigente evita una migración apenas empieza. | Versiones anteriores "probadas". | medio |
 
 ## Pendiente
-- **Usuario de la cuenta personal de GitHub** y el repo vacío `gym` creado ahí.
-- **Conectar Cloudflare Workers Builds** al repo (lo hace Gonza desde el dashboard).
+- **Probar la fase 1 en el iPhone** después del primer deploy: barra de estado, splash,
+  tab bar sobre la barra de inicio y modo avión.

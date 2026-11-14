@@ -16,8 +16,8 @@ pará y preguntá.
 - **Fase 0, lienzos:** [Gym · Lienzos](https://claude.ai/artifact/JjepiWviYnpoD3prTXjbmP).
   Aprobados por Gonza el 14/11/2026. Después se agregaron la unidad por ejercicio,
   terminar con pendientes y la carga tardía.
-- **Fase 1 (rama `fase-1`):** base de la PWA, CI y config de deploy. Falta crear el repo
-  remoto en la cuenta personal de GitHub y conectar Cloudflare.
+- **Fase 1 (rama `fase-1`, PR a `main`):** base de la PWA, CI y config de deploy. Repo en
+  `gruizmdq/gym`; Cloudflare Workers Builds conectado. Falta mergear y probar en el iPhone.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -201,7 +201,7 @@ Actions · Biome · Vitest + Playwright (WebKit).
 ## Flujo de trabajo
 - Una rama por fase, desde `main`, y un PR que mergea Gonza.
 - El repo vive en la cuenta **personal** de GitHub. El remoto usa el alias SSH `github-gym`
-  (`git@github-gym:<usuario>/gym.git`, clave `~/.ssh/id_ed25519_gym`). La otra cuenta
+  (`git@github-gym:gruizmdq/gym.git`, clave `~/.ssh/id_ed25519_gym`). La otra cuenta
   configurada en esta Mac (`gruiz-flyingheads`, también la del conector de GitHub) no se
   usa en este repo.
 - Commits atómicos. `main` despliega solo si pasan los tipos, el lint, los tests y el build.
