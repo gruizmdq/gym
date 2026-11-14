@@ -11,17 +11,29 @@ import {
 import { semanaDe } from '../dominio/prescripcion'
 import type { SerieRegistrada, Unidad } from '../dominio/series'
 import { rutina } from '../rutina/rutina'
-import { db, idSerie, type Sesion } from './db'
+import { programarSync } from '../sync/programar'
+import { db, idSerie, type Sesion, type Sincronizable } from './db'
 
-// Toda escritura pasa por acá: cada toque queda en IndexedDB al instante.
+// Toda escritura pasa por acá: cada toque queda en IndexedDB al instante, marcado como
+// pendiente de subir, y se programa una sincronización.
 
 const SEMANAS = rutina.mesociclo.semanas.length
 
 const hoy = () => fechaISO(new Date())
 
+function marca(): Sincronizable {
+  return { actualizadoEn: Date.now(), pendiente: 1 }
+}
+
 export async function registrarVersionRutina(): Promise<void> {
   if (await db.rutinas.get(__VERSION_RUTINA__)) return
-  await db.rutinas.put({ version: __VERSION_RUTINA__, contenido: json, vistaEn: Date.now() })
+  await db.rutinas.put({
+    version: __VERSION_RUTINA__,
+    contenido: json,
+    vistaEn: Date.now(),
+    ...marca(),
+  })
+  programarSync()
 }
 
 async function nuevaSesion(plan: string, dia: string, estado: Sesion['estado']): Promise<string> {
@@ -43,24 +55,35 @@ async function nuevaSesion(plan: string, dia: string, estado: Sesion['estado']):
     iniciadaEn: ahora,
     ...(estado === 'salteada' ? { finalizadaEn: ahora } : {}),
     orden: ahora,
+    ...marca(),
   })
   return id
 }
 
-export function empezarSesion(plan: string, dia: string): Promise<string> {
-  return db.transaction('rw', db.sesiones, db.mesociclos, async () => {
+export async function empezarSesion(plan: string, dia: string): Promise<string> {
+  const id = await db.transaction('rw', db.sesiones, db.mesociclos, async () => {
     const enCurso = await db.sesiones.where('estado').equals('en-curso').first()
     return enCurso ? enCurso.id : nuevaSesion(plan, dia, 'en-curso')
   })
+  programarSync()
+  return id
 }
 
 export async function saltearDia(plan: string, dia: string): Promise<void> {
   await db.transaction('rw', db.sesiones, db.mesociclos, () => nuevaSesion(plan, dia, 'salteada'))
+  programarSync(0)
 }
 
 async function reemplazarMesociclos(registros: RegistroMesociclo[]): Promise<void> {
-  await db.mesociclos.clear()
-  await db.mesociclos.bulkPut(registros)
+  const actuales = new Map((await db.mesociclos.toArray()).map((m) => [m.numero, m]))
+  // Solo los que cambiaron quedan pendientes.
+  const cambiados = registros.filter((r) => {
+    const antes = actuales.get(r.numero)
+    return !antes || antes.plan !== r.plan || antes.inicio !== r.inicio
+  })
+  await db.mesociclos.bulkPut(
+    cambiados.map((r) => ({ numero: r.numero, plan: r.plan, inicio: r.inicio, ...marca() })),
+  )
 }
 
 export async function terminarSesion(id: string): Promise<void> {
@@ -73,15 +96,18 @@ export async function terminarSesion(id: string): Promise<void> {
       finalizadaEn: ahora,
       orden: ahora,
       descanso: null,
+      ...marca(),
     })
     const registros = await db.mesociclos.toArray()
     const nuevos = arrancarAntes(registros, sesion.fecha, SEMANAS)
     if (nuevos !== registros) await reemplazarMesociclos(nuevos)
   })
+  programarSync(0)
 }
 
 export async function descartarSesion(id: string): Promise<void> {
-  await db.sesiones.update(id, { estado: 'descartada', orden: Date.now() })
+  await db.sesiones.update(id, { estado: 'descartada', orden: Date.now(), ...marca() })
+  programarSync(0)
 }
 
 async function ajustarMesociclos(
@@ -92,6 +118,7 @@ async function ajustarMesociclos(
     const nuevos = cambio(registros, hoy())
     if (nuevos !== registros) await reemplazarMesociclos(nuevos)
   })
+  programarSync()
 }
 
 export function cambiarSemanaActual(semana: number): Promise<void> {
@@ -131,12 +158,13 @@ function aSerie(d: DondeAnotar, fila: SerieRegistrada) {
     tecnicaHecha: fila.tecnicaHecha,
     repsTecnica: fila.repsTecnica,
     hecha: fila.hecha,
-    actualizadaEn: Date.now(),
+    ...marca(),
   }
 }
 
 export async function guardarFila(d: DondeAnotar, fila: SerieRegistrada): Promise<void> {
   await db.series.put(aSerie(d, fila))
+  programarSync()
 }
 
 // Completar una serie la guarda y, si cierra la serie (en unilaterales, con el segundo lado),
@@ -152,13 +180,22 @@ export async function completarFila(
       const total = descansoSegundos * 1000
       await db.sesiones.update(d.sesionId, {
         descanso: { slotId: d.slotId, terminaEn: Date.now() + total, total },
+        ...marca(),
       })
     }
   })
+  programarSync()
 }
 
 async function modificarSesion(id: string, cambio: (s: Sesion) => void): Promise<void> {
-  await db.sesiones.where('id').equals(id).modify(cambio)
+  await db.sesiones
+    .where('id')
+    .equals(id)
+    .modify((s) => {
+      cambio(s)
+      Object.assign(s, marca())
+    })
+  programarSync()
 }
 
 export function sumarDescanso(sesionId: string, ms: number): Promise<void> {
@@ -174,8 +211,10 @@ export function sumarDescanso(sesionId: string, ms: number): Promise<void> {
   })
 }
 
-export async function terminarDescanso(sesionId: string): Promise<void> {
-  await db.sesiones.update(sesionId, { descanso: null })
+export function terminarDescanso(sesionId: string): Promise<void> {
+  return modificarSesion(sesionId, (s) => {
+    s.descanso = null
+  })
 }
 
 export function elegirEjercicio(
@@ -206,8 +245,10 @@ export function retomarEjercicio(sesionId: string, slotId: string): Promise<void
   })
 }
 
-export async function guardarNotas(sesionId: string, notas: string): Promise<void> {
-  await db.sesiones.update(sesionId, { notas })
+export function guardarNotas(sesionId: string, notas: string): Promise<void> {
+  return modificarSesion(sesionId, (s) => {
+    s.notas = notas
+  })
 }
 
 export async function configurarEjercicio(
@@ -215,5 +256,6 @@ export async function configurarEjercicio(
   unidad: Unidad,
   paso: number,
 ): Promise<void> {
-  await db.ajustesEjercicio.put({ ejercicioId, unidad, paso })
+  await db.ajustesEjercicio.put({ ejercicioId, unidad, paso, ...marca() })
+  programarSync()
 }
