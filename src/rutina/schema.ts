@@ -12,9 +12,8 @@ const EjercicioSchema = z.strictObject({
   equipo: z.enum(['maquina', 'polea', 'barra', 'mancuernas', 'peso-corporal']),
   categoria: z.enum(['compuesto', 'aislamiento']),
   unilateral: z.boolean().default(false),
-  // Cómo se anota la carga: total de la máquina o barra, por mancuerna, lastre (0 = peso
-  // corporal) o sin carga (solo reps).
-  carga: z.enum(['total', 'por-mancuerna', 'lastre', 'sin-carga']).default('total'),
+  // Cómo se anota la carga: total de la máquina o barra, por mancuerna o sin carga (solo reps).
+  carga: z.enum(['total', 'por-mancuerna', 'sin-carga']).default('total'),
   // Paso por defecto en kg. La unidad y el paso reales se ajustan por ejercicio en la app.
   incremento: z.number().positive().optional(),
 })

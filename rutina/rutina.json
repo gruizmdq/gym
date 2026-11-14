@@ -18,7 +18,6 @@
     { "id": "banca-plana-barra", "nombre": "Banca plana con barra", "equipo": "barra", "categoria": "compuesto", "incremento": 2.5 },
     { "id": "press-hombro-mancuernas", "nombre": "Press de hombro con mancuernas", "equipo": "mancuernas", "categoria": "compuesto", "carga": "por-mancuerna", "incremento": 2 },
     { "id": "fly-low-to-high", "nombre": "Fly low-to-high", "equipo": "polea", "categoria": "aislamiento", "incremento": 2.5 },
-    { "id": "dominadas", "nombre": "Dominadas", "equipo": "peso-corporal", "categoria": "compuesto", "carga": "lastre", "incremento": 2.5 },
     { "id": "jalon-supino", "nombre": "Jalón supino", "detalle": "Agarre ancho de hombros", "equipo": "polea", "categoria": "compuesto", "incremento": 2.5 },
     { "id": "jalon-al-pecho", "nombre": "Jalón al pecho", "equipo": "polea", "categoria": "compuesto", "incremento": 2.5 },
     { "id": "remo-cable-v", "nombre": "Remo en polea con V", "equipo": "polea", "categoria": "compuesto", "incremento": 2.5 },
@@ -102,7 +101,7 @@
           "nombre": "Upper B",
           "foco": "V-taper",
           "slots": [
-            { "id": "dominadas", "ejercicio": "dominadas", "series": 4, "reps": { "min": 6, "max": 10 }, "descanso": 180, "cadencia": "2-0-1-0", "alternativas": ["jalon-al-pecho"], "nota": "Tirón primero. Lastradas si pasás de 10." },
+            { "id": "jalon", "ejercicio": "jalon-al-pecho", "series": 4, "reps": { "min": 6, "max": 10 }, "descanso": 180, "cadencia": "2-0-1-0", "nota": "Tirón primero." },
             { "id": "press-hombro", "ejercicio": "press-hombro-mancuernas", "series": 3, "reps": { "min": 8, "max": 12 }, "descanso": 120, "cadencia": "2-0-1-0" },
             { "id": "remo", "ejercicio": "remo-pecho-apoyado-manijas-altas", "series": 3, "reps": { "min": 8, "max": 12 }, "descanso": 120, "cadencia": "2-0-1-1", "nota": "Espalda alta, codos abiertos." },
             { "id": "press-inclinado", "ejercicio": "press-inclinado-mancuernas", "series": 3, "reps": { "min": 8, "max": 12 }, "descanso": 120, "cadencia": "2-1-1-0", "pausa": "Mancuernas a la altura del pecho, pecho abierto" },
@@ -232,7 +231,7 @@
           "nombre": "Upper B",
           "foco": "V-taper",
           "slots": [
-            { "id": "dominadas", "ejercicio": "dominadas", "series": 4, "reps": { "min": 6, "max": 10 }, "descanso": 180, "cadencia": "2-0-1-0", "alternativas": ["jalon-al-pecho"], "nota": "Tirón primero. Lastradas si pasás de 10." },
+            { "id": "jalon", "ejercicio": "jalon-al-pecho", "series": 4, "reps": { "min": 6, "max": 10 }, "descanso": 180, "cadencia": "2-0-1-0", "nota": "Tirón primero." },
             { "id": "pullover", "ejercicio": "pullover-polea", "series": 3, "reps": { "min": 10, "max": 15 }, "descanso": 90, "cadencia": "2-1-1-0", "pausa": "Arriba, brazos por encima de la cabeza, dorsal alargado", "nota": "Dorsal aislado." },
             { "id": "press-hombro", "ejercicio": "press-hombro-mancuernas", "series": 3, "reps": { "min": 8, "max": 12 }, "descanso": 120, "cadencia": "2-0-1-0" },
             { "id": "remo", "ejercicio": "remo-pecho-apoyado-manijas-altas", "series": 3, "reps": { "min": 8, "max": 12 }, "descanso": 120, "cadencia": "2-0-1-1", "nota": "Espalda alta, codos abiertos." },

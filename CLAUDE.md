@@ -150,7 +150,7 @@ Actions · Biome · Vitest + Playwright (WebKit).
     con ladrillos y no suman al volumen en kg.
   - El incremento mínimo va en la unidad del ejercicio (en ladrillos, 1).
   - Un solo gimnasio: la máquina queda implícita en el ejercicio.
-  - Mancuernas: peso por mancuerna. Dominadas: lastre (0 = peso corporal).
+  - Mancuernas: peso por mancuerna. Ab wheel: sin carga, solo reps.
   - El peso corporal va siempre en kg.
 - **Cuerpo:**
   - Peso diario, con promedio por semana de lunes a domingo y comparación con la semana
