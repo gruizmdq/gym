@@ -17,9 +17,12 @@ pará y preguntá.
   Aprobados por Gonza el 14/11/2026. Después se agregaron la unidad por ejercicio,
   terminar con pendientes y la carga tardía.
 - **Fase 1:** mergeada y desplegada en Cloudflare. Falta probarla en el iPhone.
-- **Fase 2 (rama `fase-2`):** rutina como dato, dominio (mesociclo, rotación, prescripción
-  semanal) con tests, Dexie, Hoy, una sesión mínima (empezar, terminar, descartar, saltear
-  el Día 5) y Ajustes (plan, inicio y semana). El registro de series es la fase 3.
+- **Fase 2 (rama `fase-2`, PR pendiente):** rutina como dato, dominio (mesociclo, rotación,
+  prescripción semanal) con tests, Dexie, Hoy, Ajustes (plan, inicio y semana).
+- **Fase 3 (rama `fase-3`, sale de `fase-2`):** sesión activa. Ejercicio con panel inferior,
+  prellenado desde la vez anterior, referencia secundaria, descanso por timestamps, Wake Lock,
+  teclado con `visualViewport`, unidad y paso por ejercicio, alternativas, saltear,
+  terminar con pendientes y resumen.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -69,7 +72,9 @@ src/dominio/         reglas puras con tests: fechas, mesociclo, rotación, presc
 src/datos/           Dexie: db.ts (tablas), acciones.ts (toda escritura), consultas.ts (lecturas vivas)
 src/features/<x>/    pantallas; entrenamiento/estado.ts junta dominio + datos para Hoy, sesión y Ajustes
 src/ui/              piezas sin dominio: Pagina, Hoja (<dialog>), TabBar, formato, botones
-src/pwa/             service worker y almacenamiento persistente
+src/pwa/             service worker (se registra desde main.tsx, fuera del router) y almacenamiento
+src/features/sesion/modelo.ts   cada slot de la sesión en curso: ejercicio elegido, unidad, firma, progreso
+src/features/ejercicio/         la pantalla central: filas, panel inferior y hojas de opciones
 ```
 - Para probar en el navegador sin ensuciar la rotación, descartá la sesión en vez de
   terminarla. Antes del 7/12, terminar una sesión corre el inicio del mesociclo 1 a ese
@@ -187,6 +192,10 @@ src/pwa/             service worker y almacenamiento persistente
 - **Inputs con `font-size` ≥ 16 px**, o iOS hace zoom.
 - **Barra de estado en modo claro:** `apple-mobile-web-app-status-bar-style` va en `default`.
   Con `black-translucent` el texto de la hora queda blanco sobre fondo claro.
+- **El panel de la serie edita un borrador local** y lo guarda en segundo plano. Si se lee
+  el valor de la base en cada toque, varios "+" seguidos se pisan (ya pasó).
+- **El service worker se registra desde la raíz** (`main.tsx`). Si vive en una pantalla, la
+  app abierta directo en la sesión no queda disponible sin conexión (ya pasó).
 - **Los títulos no saltan entre pestañas:** `Pagina` reserva siempre la línea del
   antetítulo, aunque esté vacía.
 - **Wake Lock se libera al ocultarse la app:** volver a pedirlo en `visibilitychange`.

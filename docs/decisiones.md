@@ -71,6 +71,17 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 33 | **Paleta de Tailwind borrada: solo existen los tokens del diseño** | "Cero hex sueltos" lo verifica el compilador de clases, no la revisión. | Convivir con la paleta default. | barato |
 | 34 | **Versiones al día: Vite 8, TypeScript 7, React Router 8, Vitest 5** | Proyecto nuevo: arrancar en lo vigente evita una migración apenas empieza. | Versiones anteriores "probadas". | medio |
 
+## Fase 3 (14/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 35 | **Sin historial: peso vacío y reps en el piso del rango; no se puede completar sin peso** | Inventar un peso sería peor que pedirlo. | Prellenar desde la referencia secundaria (otro día): otro contexto. | barato |
+| 36 | **Cambiar el peso de una serie lo lleva a las pendientes que siguen (mismo lado)** | Es lo que pasa en el gimnasio: si subís, subís todas. | Cada serie independiente. | barato |
+| 37 | **El descanso también corre después de la última serie del ejercicio** | Es el descanso antes del ejercicio siguiente. | Cortarlo al terminar el ejercicio. | barato |
+| 38 | **Las reps de la técnica no suman al volumen** | En el drop set el peso ya no es el mismo; mejor subestimar que inventar. | Sumarlas con el peso de la serie. | barato |
+| 39 | **La técnica va en la última serie, contando las agregadas** | "Siempre en la última serie". | Fijarla en la última prescripta. | barato |
+| 40 | **Series guardadas con id determinístico (`sesión:slot:ejercicio:serie:lado`)** | Cada toque es un `put` idempotente: sin búsquedas ni duplicados, y listo para sincronizar. | Ids aleatorios. | medio |
+
 ## Pendiente
 - **Probar la fase 1 en el iPhone** después del primer deploy: barra de estado, splash,
   tab bar sobre la barra de inicio y modo avión.

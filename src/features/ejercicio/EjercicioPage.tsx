@@ -75,6 +75,7 @@ export function EjercicioPage() {
   const ahora = useAhora(250)
   const teclado = useAlturaTeclado()
   const [seleccion, setSeleccion] = useState<string | null>(null)
+  const [borrador, setBorrador] = useState<Fila | null>(null)
   const [ajustando, setAjustando] = useState(false)
   const [hoja, setHoja] = useState<'opciones' | 'alternativas' | null>(null)
 
@@ -104,6 +105,9 @@ export function EjercicioPage() {
   )
   const pendiente = filaActual(filas)
   const elegida = (seleccion ? filas.find((f) => clave(f) === seleccion) : null) ?? pendiente
+  // La serie del panel se edita en local y se guarda en segundo plano: varios toques seguidos
+  // en + no se pisan esperando a que vuelva la base.
+  const enPanel = borrador && elegida && clave(borrador) === clave(elegida) ? borrador : elegida
   const anteriorDe = (f: Fila) =>
     ref.principal?.series.find((s) => s.indice === f.indice && s.lado === f.lado) ??
     ref.principal?.series.filter((s) => s.lado === f.lado).at(-1)
@@ -130,6 +134,7 @@ export function EjercicioPage() {
       await completarFila(d, fila, cierra ? actual.slot.descanso : null)
     }
     setSeleccion(null)
+    setBorrador(null)
     setAjustando(false)
   }
 
@@ -321,14 +326,17 @@ export function EjercicioPage() {
           />
         )}
 
-        {modo === 'serie' && elegida && (
+        {modo === 'serie' && enPanel && (
           <PanelSerie
-            fila={elegida}
+            fila={enPanel}
             actual={actual}
-            anterior={anteriorDe(elegida)}
-            igualar={igualarA(filas, elegida, actual)}
+            anterior={anteriorDe(enPanel)}
+            igualar={igualarA(filas, enPanel, actual)}
             pasado={pasado}
-            onCambio={(f) => void guardarFila(d, f)}
+            onCambio={(f) => {
+              setBorrador(f)
+              void guardarFila(d, f)
+            }}
             onCompletar={(f) => void completar(f)}
           />
         )}
@@ -340,9 +348,9 @@ export function EjercicioPage() {
                 <Icono d={CHECK} />
               </span>
               <div className="flex flex-col">
-                <span className="font-semibold text-body">{actual.ejercicio.nombre} completo</span>
+                <span className="font-semibold text-body">{actual.ejercicio.nombre}</span>
                 <span className="text-foot text-ink-3">
-                  {actual.seriesHechas} series · cadencia ok en{' '}
+                  Hiciste {actual.seriesHechas} series · cadencia ok en{' '}
                   {filas.filter((f) => f.hecha && f.cadenciaOk).length} de{' '}
                   {filas.filter((f) => f.hecha).length}
                 </span>
@@ -493,18 +501,23 @@ function VezAnterior({ referencias }: { referencias: ReturnType<typeof vezAnteri
         </p>
       )}
       {secundaria && (
-        <div className="flex items-center gap-2">
-          <span className="size-2 shrink-0 rounded-full bg-line-strong" aria-hidden="true" />
-          <span className="min-w-0 flex-1 truncate text-foot text-ink-2">
-            <b className="font-semibold text-ink">{fechaCorta(secundaria.sesion.fecha)}</b> ·{' '}
-            {nombreDia(secundaria.sesion.dia)}
-            {etiquetaTecnica(secundaria)}
-          </span>
-          <span className="shrink-0 font-num font-semibold text-sub">
-            {resumenSeries(
-              secundaria.series.filter((s, _i, todas) => s.lado === (todas[0]?.lado ?? null)),
-              secundaria.series[0] ? tecnicaDeFirma(secundaria.series[0].firma) : null,
-            )}
+        <div className="flex items-start gap-2">
+          <span
+            className="mt-[5px] size-2 shrink-0 rounded-full bg-line-strong"
+            aria-hidden="true"
+          />
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="text-foot text-ink-2">
+              <b className="font-semibold text-ink">{fechaCorta(secundaria.sesion.fecha)}</b> ·{' '}
+              {nombreDia(secundaria.sesion.dia)}
+              {etiquetaTecnica(secundaria)}
+            </span>
+            <span className="font-num font-semibold text-sub">
+              {resumenSeries(
+                secundaria.series.filter((s, _i, todas) => s.lado === (todas[0]?.lado ?? null)),
+                secundaria.series[0] ? tecnicaDeFirma(secundaria.series[0].firma) : null,
+              )}
+            </span>
           </span>
         </div>
       )}
