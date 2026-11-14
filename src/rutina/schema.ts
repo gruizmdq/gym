@@ -66,6 +66,8 @@ const SemanaSchema = z.strictObject({
   // Número de mesociclo desde el que hay técnicas esa semana; null = no hay.
   tecnicasDesdeMesociclo: z.number().int().min(1).nullable(),
   descarga: z.boolean().default(false),
+  // Se muestra como nota de la semana; la app no cambia nada sola.
+  nota: z.string().min(1).optional(),
 })
 
 export const RutinaSchema = z
