@@ -23,6 +23,10 @@ pará y preguntá.
   prellenado desde la vez anterior, referencia secundaria, descanso por timestamps, Wake Lock,
   teclado con `visualViewport`, unidad y paso por ejercicio, alternativas, saltear,
   terminar con pendientes y resumen.
+- **Fase 4 (rama `fase-4`, sale de `fase-3`):** Supabase (migración con RLS, cursor por
+  secuencia y última escritura gana), Dexie v3 con marca de pendiente, motor de sync, login
+  persistente, estado en Hoy y Ajustes, latido semanal. Probado contra Supabase local. Falta el
+  proyecto real: `.env` con URL y clave publicable, `.mcp.json` y `supabase db push`.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -65,6 +69,20 @@ Actions · Biome · Vitest + Playwright (WebKit).
   nueva cada vez que la app vuelve a primer plano.
 - La versión que está corriendo (commit corto) se ve en Ajustes.
 
+## Supabase
+- `supabase/migrations/` es la verdad del esquema. Se aplica con `npx supabase db push`
+  (pide la contraseña de la base: la escribe Gonza en su terminal).
+- **Local:** `npx supabase start` levanta todo en Docker (realtime, studio, storage y edge
+  apagados en `supabase/config.toml`). `.env.local` (no se commitea) apunta ahí y tiene un
+  usuario de prueba que solo existe en local. `npx supabase stop` lo apaga sin borrar datos.
+- `.env` (commiteado) tiene la URL y la clave **publicable** del proyecto real: son públicas,
+  igual van dentro de la app. La `secret`/`service_role` nunca entra al repo ni a la app.
+- Columnas en snake_case con los mismos nombres que la app. Cada tabla: `user_id` con RLS,
+  `actualizado_en` (hora del teléfono: gana la más nueva; el trigger ignora una más vieja),
+  `eliminado_en` (borrado lógico, sin `delete`) y `secuencia` (cursor del pull).
+- `public.latido()` existe solo para el cron semanal (`.github/workflows/latido.yml`) que
+  evita la pausa del plan gratuito.
+
 ## Estructura
 ```
 rutina/rutina.json   la rutina (dato); la valida src/rutina/schema.test.ts
@@ -73,6 +91,8 @@ src/datos/           Dexie: db.ts (tablas), acciones.ts (toda escritura), consul
 src/features/<x>/    pantallas; entrenamiento/estado.ts junta dominio + datos para Hoy, sesión y Ajustes
 src/ui/              piezas sin dominio: Pagina, Hoja (<dialog>), TabBar, formato, botones
 src/pwa/             service worker (se registra desde main.tsx, fuera del router) y almacenamiento
+src/sync/            el único que habla con Supabase: tablas.ts (mapeo), motor.ts (subir, bajar,
+                     resolver), iniciar.ts (cuándo corre, login), estado.ts (lo que ve la UI)
 src/features/sesion/modelo.ts   cada slot de la sesión en curso: ejercicio elegido, unidad, firma, progreso
 src/features/ejercicio/         la pantalla central: filas, panel inferior y hojas de opciones
 ```
@@ -194,6 +214,11 @@ src/features/ejercicio/         la pantalla central: filas, panel inferior y hoj
   Con `black-translucent` el texto de la hora queda blanco sobre fondo claro.
 - **El panel de la serie edita un borrador local** y lo guarda en segundo plano. Si se lee
   el valor de la base en cada toque, varios "+" seguidos se pisan (ya pasó).
+- **Toda escritura de `acciones.ts` lleva `marca()`** (`actualizadoEn` + `pendiente: 1`) y
+  llama a `programarSync()`. Una escritura sin marca nunca se sube. El sync escribe sin
+  marca, a propósito (lo que baja ya está al día).
+- **Nada de llamadas a Supabase dentro de `onAuthStateChange`**: puede trabar el cliente. Se
+  difieren con `setTimeout`.
 - **El service worker se registra desde la raíz** (`main.tsx`). Si vive en una pantalla, la
   app abierta directo en la sesión no queda disponible sin conexión (ya pasó).
 - **Los títulos no saltan entre pestañas:** `Pagina` reserva siempre la línea del

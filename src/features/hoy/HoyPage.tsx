@@ -8,6 +8,7 @@ import { boton } from '../../ui/botones'
 import { fechaLarga } from '../../ui/formato'
 import { Hoja } from '../../ui/Hoja'
 import { Pagina } from '../../ui/Pagina'
+import { InsigniaSync } from '../cuenta/Sincronizacion'
 import { armarEntrenamiento } from '../entrenamiento/estado'
 import { ListaEjercicios, TarjetaMesocicloNuevo, TarjetaSemana, TarjetaToca } from './tarjetas'
 
@@ -57,7 +58,7 @@ export function HoyPage() {
 
   return (
     <>
-      <Pagina titulo="Hoy" antetitulo={fechaLarga(hoy)}>
+      <Pagina titulo="Hoy" antetitulo={fechaLarga(hoy)} accion={<InsigniaSync />}>
         {e.puedeCambiarPlan && !e.continuar && (!e.meso.arrancado || e.meso.semana === 1) && (
           <TarjetaMesocicloNuevo e={e} />
         )}
