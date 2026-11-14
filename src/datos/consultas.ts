@@ -11,3 +11,26 @@ export function useMesociclos() {
 export function useSesiones() {
   return useLiveQuery(() => db.sesiones.toArray())
 }
+
+export function useSeriesDeSesion(sesionId: string | undefined) {
+  return useLiveQuery(
+    () => (sesionId ? db.series.where('sesionId').equals(sesionId).toArray() : []),
+    [sesionId],
+  )
+}
+
+// Historial de uno o más ejercicios (el del slot y sus alternativas), de todas las sesiones.
+export function useSeriesDeEjercicios(ids: string[]) {
+  const clave = ids.join(',')
+  return useLiveQuery(
+    () => db.series.where('ejercicioId').anyOf(clave.split(',')).toArray(),
+    [clave],
+  )
+}
+
+export function useAjustesEjercicio() {
+  return useLiveQuery(async () => {
+    const ajustes = await db.ajustesEjercicio.toArray()
+    return new Map(ajustes.map((a) => [a.ejercicioId, a]))
+  })
+}

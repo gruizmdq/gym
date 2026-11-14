@@ -48,3 +48,46 @@ export function cronometro(ms: number): string {
 }
 
 export const conMayuscula = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1)
+
+const numero = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 })
+
+/** 62,5 */
+export const formatoNumero = (n: number) => numero.format(n)
+
+/** Acepta "62,5" y "62.5" (el teclado decimal en es-AR trae coma). */
+export function leerNumero(texto: string): number | null {
+  const limpio = texto.trim().replace(',', '.')
+  if (!limpio) return null
+  const n = Number(limpio)
+  return Number.isFinite(n) && n >= 0 ? n : null
+}
+
+const CORTO = { kg: '', lb: ' lb', ladrillos: ' lad' } as const
+
+/** "150 × 12 · 12 · 11 + RP 5", "100 lb × 10 · 9" */
+export function resumenSeries(
+  series: {
+    peso: number | null
+    unidad: 'kg' | 'lb' | 'ladrillos'
+    reps: number
+    repsTecnica: number | null
+    tecnicaHecha: boolean
+  }[],
+  tecnica?: string | null,
+): string {
+  if (!series.length) return ''
+  const pesos = new Set(series.map((s) => `${s.peso}${s.unidad}`))
+  const peso = (s: (typeof series)[number]) =>
+    s.peso === null ? '' : `${formatoNumero(s.peso)}${CORTO[s.unidad]} × `
+  const primera = series[0]
+  const cuerpo =
+    pesos.size === 1 && primera
+      ? `${peso(primera)}${series.map((s) => s.reps).join(' · ')}`
+      : series.map((s) => `${peso(s)}${s.reps}`).join(' · ')
+  const conTecnica = series.find((s) => s.tecnicaHecha)
+  const extra =
+    conTecnica && tecnica
+      ? ` + ${tecnica}${conTecnica.repsTecnica ? ` ${conTecnica.repsTecnica}` : ''}`
+      : ''
+  return cuerpo + extra
+}
