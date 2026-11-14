@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Gym</title>
+  <rect width="512" height="512" rx="115" fill="#2450F0"/>
+  <g transform="translate(256 256) scale(16) translate(-12 -12)" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round">
+    <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>
+  </g>
+</svg>

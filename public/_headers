@@ -1,0 +1,9 @@
+# Los archivos de /assets llevan hash en el nombre: se pueden cachear para siempre.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# El service worker y el index siempre se revalidan, para que las versiones nuevas lleguen.
+/sw.js
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
