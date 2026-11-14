@@ -1,5 +1,7 @@
 /// <reference types="vitest/config" />
 import { execSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
@@ -16,11 +18,19 @@ function commitCorto(): string {
   }
 }
 
+// Versión de la rutina = hash del contenido: cualquier cambio en rutina.json es una versión nueva,
+// sin depender de acordarse de subir un número.
+function versionRutina(): string {
+  const contenido = JSON.stringify(JSON.parse(readFileSync('rutina/rutina.json', 'utf8')))
+  return createHash('sha256').update(contenido).digest('hex').slice(0, 12)
+}
+
 const fondo = '#F2F3F5'
 
 export default defineConfig({
   define: {
     __BUILD__: JSON.stringify(commitCorto()),
+    __VERSION_RUTINA__: JSON.stringify(versionRutina()),
   },
   plugins: [
     react(),

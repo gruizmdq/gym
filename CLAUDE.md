@@ -16,8 +16,10 @@ pará y preguntá.
 - **Fase 0, lienzos:** [Gym · Lienzos](https://claude.ai/artifact/JjepiWviYnpoD3prTXjbmP).
   Aprobados por Gonza el 14/11/2026. Después se agregaron la unidad por ejercicio,
   terminar con pendientes y la carga tardía.
-- **Fase 1 (rama `fase-1`, PR a `main`):** base de la PWA, CI y config de deploy. Repo en
-  `gruizmdq/gym`; Cloudflare Workers Builds conectado. Falta mergear y probar en el iPhone.
+- **Fase 1:** mergeada y desplegada en Cloudflare. Falta probarla en el iPhone.
+- **Fase 2 (rama `fase-2`):** rutina como dato, dominio (mesociclo, rotación, prescripción
+  semanal) con tests, Dexie, Hoy, una sesión mínima (empezar, terminar, descartar, saltear
+  el Día 5) y Ajustes (plan, inicio y semana). El registro de series es la fase 3.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -59,6 +61,19 @@ Actions · Biome · Vitest + Playwright (WebKit).
   muestra "Hay una versión nueva" hasta que se toca Actualizar. Además se busca versión
   nueva cada vez que la app vuelve a primer plano.
 - La versión que está corriendo (commit corto) se ve en Ajustes.
+
+## Estructura
+```
+rutina/rutina.json   la rutina (dato); la valida src/rutina/schema.test.ts
+src/dominio/         reglas puras con tests: fechas, mesociclo, rotación, prescripción
+src/datos/           Dexie: db.ts (tablas), acciones.ts (toda escritura), consultas.ts (lecturas vivas)
+src/features/<x>/    pantallas; entrenamiento/estado.ts junta dominio + datos para Hoy, sesión y Ajustes
+src/ui/              piezas sin dominio: Pagina, Hoja (<dialog>), TabBar, formato, botones
+src/pwa/             service worker y almacenamiento persistente
+```
+- Para probar en el navegador sin ensuciar la rotación, descartá la sesión en vez de
+  terminarla. Antes del 7/12, terminar una sesión corre el inicio del mesociclo 1 a ese
+  día: se vuelve a poner en Ajustes.
 
 ## Arquitectura: reglas duras
 - **La UI solo habla con Dexie. El único que habla con Supabase es el sync.** Nada de
