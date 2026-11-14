@@ -76,11 +76,14 @@ Actions · Biome · Vitest + Playwright (WebKit).
   signups quedan deshabilitados después de crear el usuario. RLS restringe cada tabla a
   `user_id = (select auth.uid())`. La app funciona sin sesión: la sesión solo la usa el
   sync.
-- **Rutina:** `routine/routine.json`, validada con Zod en el build (si no valida, no hay
-  deploy). La versión es el hash del contenido. Al abrir, la app guarda la versión en
+- **Rutina:** `rutina/rutina.json`, con la forma de `src/rutina/schema.ts` (Zod). El test
+  `src/rutina/schema.test.ts` la valida: si no valida, no hay deploy. Para editarla:
+  cambiá el JSON y corré `npm run test`; el error dice qué día, slot y campo fallan.
+  La versión es el hash del contenido. Al abrir, la app guarda la versión en
   `routine_versions` (local y Supabase); cada sesión guarda con qué versión se hizo.
   Cada plan lista sus días completos, **sin herencia**. Los días tienen una clave
-  compartida entre planes (`lower-a`).
+  compartida entre planes (`lower-a`). Los avisos por semana (test de banca) son datos
+  del día, no código.
 
 ## Reglas de dominio
 - **Rotación:** "hoy toca" es la sesión siguiente a la última completada (por fecha), en la secuencia
@@ -105,7 +108,8 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - **Principal de Lower A:** alterna péndulo (mesociclos impares) y sentadilla de palanca
   (pares). La prensa queda fija.
 - **Firma de prescripción** = clave de día + ejercicio realmente usado + rango de reps +
-  cadencia + técnica del slot + unilateral.
+  cadencia + técnica del slot. Unilateral es parte del ejercicio: la extensión unilateral
+  es otro ejercicio del catálogo, con su propio historial.
 - **El historial sigue al ejercicio, nunca al lugar en la rutina.** Cambiar de rutina o
   reemplazar un ejercicio no pierde ni mezcla historial. Los ids del catálogo son estables:
   nunca se renombran ni se reutilizan para otro ejercicio. Usar una alternativa en la

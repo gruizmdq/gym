@@ -32,7 +32,7 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 |---|---|---|---|---|
 | 10 | **La versión de la rutina es el hash del contenido** | Cualquier cambio genera versión nueva sin depender de acordarse de subir un número. | Campo `version` manual. | barato |
 | 11 | **Planes con los días completos, sin herencia** | Es más fácil de editar (también para Claude) y de validar que una lógica de overrides. | "El 4d es el 5d con estos cambios". | barato |
-| 12 | **Firma con "unilateral"** | La extensión bilateral y la unilateral no se pueden comparar. | Firma sin ese dato. | barato |
+| 12 | **Unilateral = ejercicio propio del catálogo** (corregida en la fase 2; antes era un dato de la firma) | La extensión bilateral y la unilateral no se pueden comparar, y como el historial sigue al ejercicio, tampoco tienen que mezclarse en sus gráficos. | Un flag "unilateral" en el slot y en la firma: mezclaba los dos en el historial del ejercicio. | barato |
 | 13 | **La descarga no es referencia ni cuenta para progresión** | Son las mismas cargas con la mitad de series: no mide progreso. | Tratarla como una semana más. | barato |
 | 14 | **Solo el Día 5 se puede saltear, con un botón** | "No se saltea, se rota"; el Día 5 es el complementario (PDF). | Saltearlo automáticamente al cambiar la semana calendario: es más sorpresivo. | barato |
 | 15 | **Descarga: mitad de series redondeando para arriba** | Decisión de Gonza. | Redondear para abajo. | barato |
