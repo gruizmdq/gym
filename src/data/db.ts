@@ -39,6 +39,8 @@ export interface Session extends Syncable {
   // Rest is stored as its end time: it survives a locked screen and closing the app.
   rest?: Rest | null
   notes?: string
+  // Logged afterwards for a past date: no rest, no wake lock, no duration.
+  backfilled?: boolean
 }
 
 export interface SetRecord extends LoggedSet, Syncable {
@@ -64,6 +66,28 @@ export interface RoutineVersion extends Syncable {
 
 export interface Mesocycle extends MesocycleRecord, Syncable {}
 
+// One weighing per day. Body weight is always in kg.
+export interface Weight extends Syncable {
+  date: IsoDate
+  kg: number
+}
+
+// The day's three waist measurements, in cm. The average is derived.
+export interface Waist extends Syncable {
+  date: IsoDate
+  measurements: number[]
+}
+
+// Monthly circumferences, in cm, one side.
+export interface Circumferences extends Syncable {
+  date: IsoDate
+  thigh: number
+  calf: number
+  arm: number
+  chest: number
+  shoulders: number
+}
+
 // Phone-only data that isn't synced (sync cursors).
 export interface Meta {
   key: string
@@ -79,6 +103,9 @@ export const db = new Dexie('gym') as Dexie & {
   routines: EntityTable<RoutineVersion, 'version'>
   sets: EntityTable<SetRecord, 'id'>
   exerciseSettings: EntityTable<ExerciseSetting, 'exerciseId'>
+  weights: EntityTable<Weight, 'date'>
+  waists: EntityTable<Waist, 'date'>
+  circumferences: EntityTable<Circumferences, 'date'>
   meta: EntityTable<Meta, 'key'>
 }
 
@@ -88,6 +115,9 @@ export const SYNCED_TABLES = [
   'sessions',
   'sets',
   'exerciseSettings',
+  'weights',
+  'waists',
+  'circumferences',
 ] as const
 
 function seedInitialMesocycle(tx: Transaction) {
@@ -108,6 +138,13 @@ db.version(5)
     meta: 'key',
   })
   .upgrade(seedInitialMesocycle)
+
+// Phase 6: body measurements.
+db.version(6).stores({
+  weights: 'date, pending',
+  waists: 'date, pending',
+  circumferences: 'date, pending',
+})
 
 db.on('populate', (tx) => {
   void seedInitialMesocycle(tx)

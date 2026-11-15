@@ -127,3 +127,16 @@ export function volume(set: LoggedSet, load: Load): number {
   const kg = set.unit === 'lb' ? set.weight * KG_PER_LB : set.weight
   return kg * (load === 'per-dumbbell' ? 2 : 1) * set.reps
 }
+
+// Completed sets of a session: a unilateral one counts once, when both sides are done.
+export function completedSets(
+  sets: (LoggedSet & { slotId: string; exerciseId: string })[],
+): number {
+  const sides = new Map<string, Set<string>>()
+  for (const s of sets) {
+    if (!s.done) continue
+    const key = `${s.slotId}:${s.exerciseId}:${s.number}`
+    sides.set(key, (sides.get(key) ?? new Set()).add(s.side ?? '-'))
+  }
+  return [...sides.values()].filter((d) => d.has('-') || d.size === 2).length
+}

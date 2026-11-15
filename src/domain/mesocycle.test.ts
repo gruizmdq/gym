@@ -5,6 +5,7 @@ import {
   currentMesocycle,
   type MesocycleRecord,
   mesocycleAt,
+  mesocycleStart,
   startEarly,
 } from './mesocycle'
 
@@ -84,5 +85,22 @@ describe('startEarly', () => {
 
   it('with the mesocycle in progress nothing changes', () => {
     expect(startEarly(initial, '2026-12-10', WEEKS)).toBe(initial)
+  })
+})
+
+describe('mesocycleStart', () => {
+  it('derived ones start every six weeks from the last stored one', () => {
+    expect(mesocycleStart(initial, 1, WEEKS)).toBe('2026-12-07')
+    expect(mesocycleStart(initial, 3, WEEKS)).toBe('2027-03-01')
+  })
+
+  it('a stored one (week or start changed) wins over the derivation', () => {
+    const records = [...initial, { number: 2, plan: '4d', start: '2027-01-25' }]
+    expect(mesocycleStart(records, 2, WEEKS)).toBe('2027-01-25')
+    expect(mesocycleStart(records, 3, WEEKS)).toBe('2027-03-08')
+  })
+
+  it('before the first stored one there is none', () => {
+    expect(mesocycleStart([{ number: 2, plan: '5d', start: '2027-01-18' }], 1, WEEKS)).toBeNull()
   })
 })

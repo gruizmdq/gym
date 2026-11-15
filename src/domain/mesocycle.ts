@@ -42,6 +42,19 @@ export function mesocycleAt(
   }
 }
 
+// When a mesocycle starts: the last stored one up to it, plus whole mesocycles.
+export function mesocycleStart(
+  records: MesocycleRecord[],
+  number: number,
+  weeksPerMesocycle: number,
+): IsoDate | null {
+  const base = records
+    .filter((r) => r.number <= number)
+    .sort((a, b) => a.number - b.number)
+    .at(-1)
+  return base ? addDays(base.start, (number - base.number) * weeksPerMesocycle * 7) : null
+}
+
 // The mesocycle in progress or, if none has started yet, the next one (in its week 1).
 export function currentMesocycle(
   records: MesocycleRecord[],

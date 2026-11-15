@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildRows,
+  completedSets,
   completesSet,
   convertWeight,
   type LoggedSet,
@@ -162,5 +163,37 @@ describe('volume', () => {
     ['an incomplete set does not count', set(1, 150, 12, { done: false }), 'total', 0],
   ])('%s', (_case, s, load, expected) => {
     expect(volume(s, load)).toBeCloseTo(expected, 5)
+  })
+})
+
+describe('completedSets', () => {
+  const row = (slotId: string, number: number, side: LoggedSet['side'], done = true) => ({
+    slotId,
+    exerciseId: slotId,
+    number,
+    side,
+    weight: 50,
+    unit: 'kg' as const,
+    reps: 10,
+    tempoOk: true,
+    techniqueDone: false,
+    techniqueReps: null,
+    done,
+  })
+
+  it('a unilateral set counts once, only with both sides done', () => {
+    expect(
+      completedSets([
+        row('press', 1, null),
+        row('press', 2, null),
+        row('ext', 1, 'left'),
+        row('ext', 1, 'right'),
+        row('ext', 2, 'left'),
+      ]),
+    ).toBe(3)
+  })
+
+  it('sets edited but not completed don’t count', () => {
+    expect(completedSets([row('press', 1, null), row('press', 2, null, false)])).toBe(1)
   })
 })

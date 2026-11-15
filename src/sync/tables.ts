@@ -1,10 +1,14 @@
 import type {
+  Circumferences,
   ExerciseSetting,
   Mesocycle,
   RoutineVersion,
   Session,
   SetRecord,
+  SYNCED_TABLES,
   Syncable,
+  Waist,
+  Weight,
 } from '../data/db'
 
 // How each phone table looks in Postgres. Columns use the same names as the app, in
@@ -13,7 +17,7 @@ import type {
 export type RemoteRow = Record<string, unknown>
 
 export interface TableDefinition<L extends Syncable> {
-  local: 'routines' | 'mesocycles' | 'sessions' | 'sets' | 'exerciseSettings'
+  local: (typeof SYNCED_TABLES)[number]
   remote: string
   // Upsert columns (primary key in Postgres).
   conflict: string
@@ -97,6 +101,7 @@ const sessions: TableDefinition<Session> = {
     skipped: r.skipped ?? [],
     rest: r.rest ?? null,
     notes: r.notes ?? null,
+    backfilled: r.backfilled ?? false,
   }),
   toLocal: (r) => ({
     ...fromRemote(r),
@@ -117,6 +122,7 @@ const sessions: TableDefinition<Session> = {
     skipped: (r.skipped ?? []) as string[],
     rest: (r.rest ?? null) as Session['rest'],
     ...(typeof r.notes === 'string' ? { notes: r.notes } : {}),
+    ...(r.backfilled ? { backfilled: true } : {}),
   }),
 }
 
@@ -182,5 +188,64 @@ const exerciseSettings: TableDefinition<ExerciseSetting> = {
   }),
 }
 
+const weights: TableDefinition<Weight> = {
+  local: 'weights',
+  remote: 'weights',
+  conflict: 'user_id,date',
+  localKey: (r) => r.date,
+  remoteKey: (r) => text(r.date),
+  toRemote: (r, u) => ({ ...sync(r, u), date: r.date, kg: r.kg }),
+  toLocal: (r) => ({ ...fromRemote(r), date: text(r.date), kg: num(r.kg) }),
+}
+
+const waists: TableDefinition<Waist> = {
+  local: 'waists',
+  remote: 'waists',
+  conflict: 'user_id,date',
+  localKey: (r) => r.date,
+  remoteKey: (r) => text(r.date),
+  toRemote: (r, u) => ({ ...sync(r, u), date: r.date, measurements: r.measurements }),
+  toLocal: (r) => ({
+    ...fromRemote(r),
+    date: text(r.date),
+    measurements: ((r.measurements ?? []) as unknown[]).map(num),
+  }),
+}
+
+const circumferences: TableDefinition<Circumferences> = {
+  local: 'circumferences',
+  remote: 'circumferences',
+  conflict: 'user_id,date',
+  localKey: (r) => r.date,
+  remoteKey: (r) => text(r.date),
+  toRemote: (r, u) => ({
+    ...sync(r, u),
+    date: r.date,
+    thigh: r.thigh,
+    calf: r.calf,
+    arm: r.arm,
+    chest: r.chest,
+    shoulders: r.shoulders,
+  }),
+  toLocal: (r) => ({
+    ...fromRemote(r),
+    date: text(r.date),
+    thigh: num(r.thigh),
+    calf: num(r.calf),
+    arm: num(r.arm),
+    chest: num(r.chest),
+    shoulders: num(r.shoulders),
+  }),
+}
+
 // In this order: sets reference their session, which has to be pushed first.
-export const TABLES = [routines, mesocycles, sessions, sets, exerciseSettings] as const
+export const TABLES = [
+  routines,
+  mesocycles,
+  sessions,
+  sets,
+  exerciseSettings,
+  weights,
+  waists,
+  circumferences,
+] as const

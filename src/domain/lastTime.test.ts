@@ -107,4 +107,15 @@ describe('lastTime', () => {
     ]
     expect(lastTime(s, h, wanted()).primary?.sets.map((x) => x.number)).toEqual([1, 2])
   })
+
+  it('a backfilled session only looks at sessions before its date', () => {
+    const s = [session('jan25', '2027-01-25', 'lower-a'), session('feb1', '2027-02-01', 'lower-a')]
+    const h = [
+      ...sets('jan25', 'leg-press', SIGNATURE_LA, [12, 12, 11]),
+      ...sets('feb1', 'leg-press', SIGNATURE_LA, [12, 12, 12]),
+    ]
+    expect(lastTime(s, h, wanted()).primary?.session.id).toBe('feb1')
+    expect(lastTime(s, h, { ...wanted(), before: '2027-01-28' }).primary?.session.id).toBe('jan25')
+    expect(lastTime(s, h, { ...wanted(), before: '2027-01-25' }).primary).toBeNull()
+  })
 })
