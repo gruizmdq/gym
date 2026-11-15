@@ -101,12 +101,22 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 48 | **Todo el código en inglés: identificadores, archivos, rutas, comentarios, tests, ids del catálogo, valores de enums, claves de `routine.json`, tablas y columnas** | Pedido de Gonza: no tolera código en español. Se hizo antes de tener datos reales, así que los ids y las tablas se pudieron renombrar sin migrar nada. | Solo identificadores; o dejar la base en español con un mapeo. | caro: desde acá los ids quedan congelados |
 | 49 | **La pantalla, `CLAUDE.md` y `decisiones.md` siguen en español; los commits van en inglés** | La app es para Gonza; los docs también. | Todo en inglés. | barato |
 | 50 | **Un valor de enum nunca se muestra crudo: pasa por un mapa a su etiqueta** (`TECHNIQUE_LABEL`, unidad, cadencia `slow` → "lenta") | Los valores en inglés no pueden llegar a la pantalla. | Dejar los valores en español. | barato |
-| 51 | **Dexie arranca en la versión 4 con un solo esquema; Supabase recibe una migración que borra las tablas vacías y las crea con los nombres nuevos** | No había datos: copiar no aportaba nada. Dexie borra solo las tablas que ya no declara. La primera migración queda como historia (ya está aplicada). | Migrar filas; reescribir la primera migración (obliga a reparar el historial remoto). | barato |
+| 51 | **Dexie pasa por la versión 4 (borra las tablas) y la 5 (las crea en inglés); Supabase recibe una migración que borra las tablas vacías y las crea con los nombres nuevos** | No había datos: copiar no aportaba nada. Dexie no puede cambiar una clave primaria en el lugar (la de `meta` cambiaba), por eso hace falta la 4; la 5 además siembra el mesociclo 1, que `populate` solo crea en una base nueva. La primera migración queda como historia (ya está aplicada). | Migrar filas; reescribir la primera migración (obliga a reparar el historial remoto). | barato |
+
+## Fase 5 (14/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 52 | **Retroceso = peso tope y, a igual peso, reps a ese peso** | Subir de peso y volver al piso nunca cuenta como bajar, que es justo lo que pide la doble progresión. | 1RM estimado y volumen: los dos dan falsa alarma después de subir de peso. | barato |
+| 53 | **La cadena de retroceso cruza mesociclos** | Decisión de Gonza. La descarga nunca cuenta. | Solo dentro del mismo mesociclo (evitaba el aviso en la semana 1). | barato |
+| 54 | **Sin sugerencia de subir en la semana 1 ni en la descarga** | En calibración se buscan las cargas para RIR 2–3; la referencia suele ser la semana 5, a RIR 1. | Sugerir en todas las semanas de trabajo. | barato |
+| 55 | **Las series agregadas a mano no cuentan ni para subir ni para el retroceso; una sesión con series de menos no entra en la cadena** | La serie extra de las semanas 4–5 suele salir con menos reps y bloquearía la progresión o daría falsa alarma. | Contar todas las series hechas. | barato |
+| 56 | **"Para la próxima" del resumen: los que suben y los que quedaron a exactamente 1 rep** | Como en el lienzo: la lista queda corta y muestra lo que está por pasar. Una serie sin cadencia no es "a 1 rep". | Todos los ejercicios; solo los que suben. | barato |
+| 57 | **El aviso de subir se aplica con un toque y el estado "aplicado" se deriva de los pesos** | Es una sugerencia: no cambia nada solo. Derivarlo evita guardar una marca más. | Guardar si se aplicó. | barato |
 
 ## Pendiente
 - **Probar la fase 1 en el iPhone** después del primer deploy: barra de estado, splash,
   tab bar sobre la barra de inicio y modo avión.
 - **Proyecto real de Supabase** (`wuampfwqeqbqbbxdqzzq`, MCP ya configurado): clave publicable
-  en `.env`, primera migración aplicada y usuario creado. Falta aplicar
-  `20261114230000_english_names.sql` con `npx supabase db push --remote` y confirmar que los
-  signups estén apagados.
+  en `.env`, las dos migraciones aplicadas y usuario creado. Falta confirmar que los signups
+  estén apagados.

@@ -28,7 +28,10 @@ pará y preguntá.
   persistente, estado en Hoy y Ajustes, latido semanal. Probado contra Supabase local.
 - **Código en inglés (rama `english-codebase`):** identificadores, archivos, ids, tablas de
   Dexie y de Supabase. La migración `20261114230000_english_names.sql` reemplaza las tablas
-  vacías de la primera: falta aplicarla al proyecto real con `npx supabase db push --remote`.
+  vacías de la primera; ya está aplicada en el proyecto real (14/11/2026).
+- **Fase 5 (rama `fase-5`):** progresión doble (aviso con "Subir" en el ejercicio y "Para la
+  próxima" en el resumen) y alerta de retroceso en el resumen. La referencia secundaria y el
+  aviso de no equivalente ya estaban desde la fase 3.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -171,8 +174,20 @@ src/features/exercise/          la pantalla central: filas, panel inferior y hoj
   del rango con `tempoOk`, se sugiere subir el incremento mínimo del ejercicio y volver al
   piso. En unilaterales, por lado. Las reps extra de la técnica no cuentan. **Es una
   sugerencia, nunca un cambio automático.**
+  - Solo contra la referencia principal equivalente. Cuentan las series prescriptas; las
+    agregadas a mano no.
+  - No hay sugerencia en la semana 1 (calibración) ni en la descarga.
+  - En el ejercicio se aplica con "Subir" (las pendientes de ese lado pasan al peso nuevo y
+    al piso). En el resumen, "Para la próxima" muestra los que suben y los que quedaron a
+    exactamente 1 rep; después de la semana 5 no muestra nada.
 - **Alerta de retroceso:** si un compuesto retrocede dos sesiones seguidas, se avisa:
   "sacá las técnicas esta semana antes de tocar otra cosa".
+  - Rendimiento de una sesión = peso tope; a igual peso, reps a ese peso (sin técnica, solo
+    las series prescriptas). lb se compara en kg; ladrillos solo con ladrillos.
+  - Últimas tres sesiones con la misma firma, sin descarga, de cualquier mesociclo. Una
+    sesión con series de menos no entra en la cadena.
+  - Se muestra en el resumen de la sesión que cierra la cadena. Unilaterales: alcanza con
+    un lado.
 - **Sesión:**
   - Orden libre: se puede empezar por cualquier ejercicio.
   - Solo series efectivas: las de aproximación no se anotan.
