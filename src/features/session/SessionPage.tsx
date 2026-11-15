@@ -58,7 +58,7 @@ export function SessionPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col gap-3 px-4 pt-[env(safe-area-inset-top)]">
+    <div className="mx-auto flex min-h-dvh max-w-app flex-col gap-3 px-4 pt-[env(safe-area-inset-top)]">
       <nav className="-mx-2.5 flex h-11 items-center justify-between">
         <button
           type="button"
@@ -204,7 +204,7 @@ export function SessionPage() {
 
       <div className="h-48 shrink-0" aria-hidden="true" />
 
-      <section className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2.5 rounded-t-[26px] bg-surface px-4 pt-3.5 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-panel">
+      <section className="fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-app flex-col gap-2.5 rounded-t-[26px] bg-surface px-4 pt-3.5 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-panel">
         {rest && (
           <>
             <div className="flex items-center gap-3">

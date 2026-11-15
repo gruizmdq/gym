@@ -13,7 +13,7 @@ export function TabBar() {
   return (
     <nav
       aria-label="Secciones"
-      className="fixed inset-x-4 bottom-[max(12px,calc(env(safe-area-inset-bottom)-10px))] z-30 grid h-16 grid-cols-4 rounded-full bg-surface/85 p-1 shadow-float backdrop-blur-xl backdrop-saturate-150"
+      className="fixed inset-x-4 bottom-[max(12px,calc(env(safe-area-inset-bottom)-10px))] z-30 mx-auto grid max-w-[calc(var(--container-app)-2rem)] h-16 grid-cols-4 rounded-full bg-surface/85 p-1 shadow-float backdrop-blur-xl backdrop-saturate-150"
     >
       {sections.map(({ to, label, Icon }) => (
         <NavLink

@@ -26,8 +26,11 @@ export function AppShell() {
 
   return (
     <div className="flex h-dvh flex-col">
-      <main className="flex-1 overflow-y-auto overscroll-contain px-4 pt-[env(safe-area-inset-top)] pb-32">
-        <Outlet />
+      {/* The scroll covers the whole window; the content keeps to the app's column. */}
+      <main className="flex-1 overflow-y-auto overscroll-contain pt-[env(safe-area-inset-top)] pb-32">
+        <div className="mx-auto max-w-app px-4">
+          <Outlet />
+        </div>
       </main>
       <TabBar />
     </div>

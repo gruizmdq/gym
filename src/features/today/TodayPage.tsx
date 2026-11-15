@@ -76,7 +76,9 @@ export function TodayPage() {
         className="pointer-events-none fixed inset-x-0 bottom-0 z-20 h-[calc(max(12px,env(safe-area-inset-bottom)-10px)+76px+150px)] bg-linear-to-b from-transparent to-bg to-35%"
         aria-hidden="true"
       />
-      <div className={`fixed inset-x-4 z-20 flex flex-col gap-1 ${aboveTabBar}`}>
+      <div
+        className={`fixed inset-x-4 z-20 mx-auto flex max-w-[calc(var(--container-app)-2rem)] flex-col gap-1 ${aboveTabBar}`}
+      >
         <button type="button" className={button.primary} onClick={() => void start()}>
           {e.resume ? 'Continuar' : 'Empezar'} {e.day.name}
         </button>
