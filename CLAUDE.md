@@ -26,7 +26,7 @@ pará y preguntá.
 - **Fase 4 (rama `fase-4`, sale de `fase-3`):** Supabase (migración con RLS, cursor por
   secuencia y última escritura gana), Dexie v3 con marca de pendiente, motor de sync, login
   persistente, estado en Hoy y Ajustes, latido semanal. Probado contra Supabase local. Falta el
-  proyecto real: `.env` con URL y clave publicable y `supabase db push`.
+  proyecto real: aplicar la migración con `npx supabase db push --remote`.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -70,8 +70,9 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - La versión que está corriendo (commit corto) se ve en Ajustes.
 
 ## Supabase
-- `supabase/migrations/` es la verdad del esquema. Se aplica con `npx supabase db push`
-  (pide la contraseña de la base: la escribe Gonza en su terminal).
+- `supabase/migrations/` es la verdad del esquema. Al proyecto real se aplica con
+  `npx supabase db push --remote` (la CLI 3 apunta al stack local si falta `--remote`). Pide
+  la contraseña de la base: la escribe Gonza en su terminal.
 - **Local:** `npx supabase start` levanta todo en Docker (realtime, studio, storage y edge
   apagados en `supabase/config.toml`). `.env.local` (no se commitea) apunta ahí y tiene un
   usuario de prueba que solo existe en local. `npx supabase stop` lo apaga sin borrar datos.
