@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router'
 import { AjustesPage } from '../features/ajustes/AjustesPage'
+import { EntrarPage } from '../features/cuenta/EntrarPage'
 import { CuerpoPage } from '../features/cuerpo/CuerpoPage'
 import { EjercicioPage } from '../features/ejercicio/EjercicioPage'
 import { HistorialPage } from '../features/historial/HistorialPage'
@@ -29,4 +30,5 @@ export const router = createBrowserRouter([
     ],
   },
   { path: '/resumen/:id', Component: ResumenPage },
+  { path: '/entrar', Component: EntrarPage },
 ])

@@ -82,6 +82,20 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 39 | **La técnica va en la última serie, contando las agregadas** | "Siempre en la última serie". | Fijarla en la última prescripta. | barato |
 | 40 | **Series guardadas con id determinístico (`sesión:slot:ejercicio:serie:lado`)** | Cada toque es un `put` idempotente: sin búsquedas ni duplicados, y listo para sincronizar. | Ids aleatorios. | medio |
 
+## Fase 4 (14/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 41 | **Cursor de pull = secuencia de Postgres asignada por trigger** | No depende del reloj del teléfono; nunca se saltea un cambio. | `updated_at > último visto`: dos escrituras en el mismo instante o un reloj corrido pierden filas. | caro |
+| 42 | **Gana la última escritura por fila, con la hora del teléfono; el trigger ignora versiones más viejas** | Un usuario y casi siempre un teléfono: los conflictos reales son raros y así se resuelven solos. | Merge por campo o CRDT: complejidad sin un caso que lo pida. | medio |
+| 43 | **Marca de pendiente explícita en `acciones.ts`, sin hooks de Dexie** | Es explícito y se testea; los hooks no distinguen fácil una escritura propia de una que baja del servidor. | Hooks `creating`/`updating`. | barato |
+| 44 | **Supabase local en Docker para probar** | La única forma de probar RLS, triggers y login de verdad antes de tocar el proyecto real. | Probar solo con dobles. | barato |
+| 45 | **URL y clave publicable en `.env` commiteado** | Son públicas por diseño; evita configurar variables en Cloudflare. | Variables de entorno en Cloudflare. | barato |
+| 46 | **Login ofrecido una vez al abrir y después desde Ajustes; sin signup en la app** | Hay un solo usuario y se crea a mano; la app sigue andando sin cuenta. | Login obligatorio. | barato |
+| 47 | **Cron semanal en Actions contra `public.latido()`** | El plan gratuito pausa el proyecto tras 7 días sin actividad. | Reactivarlo a mano desde el dashboard. | barato |
+
 ## Pendiente
 - **Probar la fase 1 en el iPhone** después del primer deploy: barra de estado, splash,
   tab bar sobre la barra de inicio y modo avión.
+- **Proyecto real de Supabase** (`wuampfwqeqbqbbxdqzzq`, MCP ya configurado): clave publicable para `.env`;
+  migración aplicada con `npx supabase db push`; usuario creado y signups apagados.

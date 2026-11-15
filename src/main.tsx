@@ -5,10 +5,12 @@ import { router } from './app/router'
 import { registrarVersionRutina } from './datos/acciones'
 import { AvisoVersionNueva } from './pwa/AvisoVersionNueva'
 import { pedirAlmacenamientoPersistente } from './pwa/almacenamiento'
+import { iniciarSync } from './sync/iniciar'
 import './index.css'
 
 void pedirAlmacenamientoPersistente()
 void registrarVersionRutina()
+iniciarSync()
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Falta el elemento #root en index.html')

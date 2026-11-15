@@ -3,10 +3,12 @@ import type { ReactNode } from 'react'
 export function Pagina({
   titulo,
   antetitulo,
+  accion,
   children,
 }: {
   titulo: string
   antetitulo?: string
+  accion?: ReactNode
   children?: ReactNode
 }) {
   return (
@@ -19,7 +21,10 @@ export function Pagina({
         >
           {antetitulo}
         </p>
-        <h1 className="font-bold text-large-title tracking-[-.02em]">{titulo}</h1>
+        <div className="flex items-end justify-between gap-3">
+          <h1 className="font-bold text-large-title tracking-[-.02em]">{titulo}</h1>
+          {accion && <div className="mb-1">{accion}</div>}
+        </div>
       </header>
       {children}
     </div>

@@ -5,6 +5,7 @@ import { fechaISO } from '../../dominio/fechas'
 import { rutina } from '../../rutina/rutina'
 import { fechaCorta } from '../../ui/formato'
 import { Pagina } from '../../ui/Pagina'
+import { SeccionCuenta } from '../cuenta/Sincronizacion'
 import { armarEntrenamiento } from '../entrenamiento/estado'
 
 const chevron = (
@@ -129,6 +130,8 @@ export function AjustesPage() {
           </p>
         </section>
       )}
+
+      <SeccionCuenta />
 
       <p className="px-4 text-foot text-ink-3">
         Gym · versión <span className="font-num">{__BUILD__}</span> · rutina{' '}
