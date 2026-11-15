@@ -45,7 +45,7 @@
   },
   "overrides": [
     {
-      "includes": ["rutina/**"],
+      "includes": ["routine/**"],
       "json": {
         "formatter": {
           "lineWidth": 320

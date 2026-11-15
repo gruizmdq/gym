@@ -6,7 +6,7 @@
     "directory": "./dist",
     "not_found_handling": "single-page-application"
   },
-  // Las ramas que no son main se publican como preview (npx wrangler preview), con su
-  // propia URL: sirve para probar un PR en el iPhone antes de mergearlo.
+  // Branches other than main are published as previews (npx wrangler preview), each with
+  // its own URL: useful to try a PR on the iPhone before merging it.
   "previews": {}
 }
