@@ -5,10 +5,14 @@ import {
 } from '@cloudflare/workers-oauth-provider'
 import { authorize } from './authorize'
 import { serveMcp } from './mcp'
+import { servePush } from './push'
 import { type Props, refresh } from './supabase'
 
-// The Worker in front of the app: the remote MCP server (/mcp) and its OAuth server. Everything
-// else is the app's static files, which never reach this code (run_worker_first in wrangler.jsonc).
+export { RestAlarm } from './restAlarm'
+
+// The Worker in front of the app: the remote MCP server (/mcp) with its OAuth server, and the push
+// at the end of the rest (/push). Everything else is the app's static files, which never reach
+// this code (run_worker_first in wrangler.jsonc).
 
 const DAY = 86_400
 
@@ -67,7 +71,9 @@ const providers = new Map<string, OAuthProvider<Env>>()
 
 export default {
   fetch(request, env, ctx) {
-    const origin = new URL(request.url).origin
+    const url = new URL(request.url)
+    if (url.pathname.startsWith('/push/')) return servePush(request, env)
+    const origin = url.origin
     let provider = providers.get(origin)
     if (!provider) {
       provider = createProvider(origin)

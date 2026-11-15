@@ -1,4 +1,9 @@
-import { createClient, isAuthApiError, type Session } from '@supabase/supabase-js'
+import {
+  createClient,
+  isAuthApiError,
+  type Session,
+  type SupabaseClient,
+} from '@supabase/supabase-js'
 
 // The Worker talks to Supabase as Gonza: his session travels encrypted inside the OAuth grant
 // and RLS applies as in the app. No secret or service_role key anywhere.
@@ -51,4 +56,22 @@ export async function refresh(env: Env, refreshToken: string): Promise<Props | '
     throw error
   }
   return data.session ? toProps(data.session) : 'revoked'
+}
+
+// One per isolate: it keeps Supabase's public keys in memory and checks tokens without asking.
+let verifier: { url: string; client: SupabaseClient } | null = null
+
+// Who a Supabase access token from the app belongs to; null if it isn't valid (or expired).
+export async function userOf(env: Env, token: string): Promise<string | null> {
+  if (verifier?.url !== env.SUPABASE_URL) {
+    verifier = { url: env.SUPABASE_URL, client: anonymous(env) }
+  }
+  try {
+    const { data, error } = await verifier.client.auth.getClaims(token)
+    if (error || !data) return null
+    return data.claims.role === 'authenticated' ? data.claims.sub : null
+  } catch {
+    // Not even a JWT.
+    return null
+  }
 }
