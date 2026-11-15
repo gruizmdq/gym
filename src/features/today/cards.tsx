@@ -1,7 +1,11 @@
 import { changeCurrentPlan } from '../../data/actions'
+import type { Weight } from '../../data/db'
+import { addDays, type IsoDate } from '../../domain/dates'
 import { TECHNIQUE_LABEL } from '../../domain/prescription'
 import { routine } from '../../routine/routine'
 import { duration, longDate, range, rir } from '../../ui/format'
+import { BodyIcon } from '../../ui/icons'
+import { mediumButton, oneDecimal } from '../body/parts'
 import { abbreviation, type Training } from '../training/state'
 
 const tick = (
@@ -155,6 +159,55 @@ export function UpNextCard({ e }: { e: Training }) {
           La última {day.name} te llevó {duration(e.lastDuration)}.
         </p>
       )}
+    </section>
+  )
+}
+
+// Today's weighing, or yesterday's as a reference. Opens the same sheet as the body screen.
+export function WeightCard({
+  weights,
+  today,
+  onOpen,
+}: {
+  weights: Weight[] | undefined
+  today: IsoDate
+  onOpen: () => void
+}) {
+  const todayWeight = weights?.find((w) => w.date === today)
+  const yesterdayWeight = weights?.find((w) => w.date === addDays(today, -1))
+  const shown = todayWeight
+    ? { label: 'Hoy', kg: todayWeight.kg }
+    : yesterdayWeight
+      ? { label: 'Ayer', kg: yesterdayWeight.kg }
+      : null
+
+  return (
+    <section className="flex items-center gap-3 rounded-card bg-surface py-3 pr-3 pl-4">
+      <BodyIcon className="shrink-0 text-ink-2" />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <h2 className="font-semibold text-body">Peso de hoy</h2>
+        {weights === undefined ? (
+          <span aria-busy="true" className="my-px block h-4 w-24 animate-pulse rounded bg-fill" />
+        ) : (
+          <span className="text-foot text-ink-3">
+            {shown ? (
+              <>
+                {shown.label}: <span className="font-num">{oneDecimal(shown.kg)}</span> kg
+              </>
+            ) : (
+              'Todavía no te pesaste hoy'
+            )}
+          </span>
+        )}
+      </div>
+      <button
+        type="button"
+        className={mediumButton}
+        onClick={onOpen}
+        disabled={weights === undefined}
+      >
+        {todayWeight ? 'Editar' : 'Registrar'}
+      </button>
     </section>
   )
 }
