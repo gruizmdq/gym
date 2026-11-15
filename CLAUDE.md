@@ -35,6 +35,11 @@ pará y preguntá.
 - **Fase 6 (rama `fase-6`, sale de `fase-5`):** Cuerpo (peso, cintura, circunferencias),
   historial de sesiones y de ejercicio con gráficos, y carga tardía. Dexie v6 y la migración
   `20261115000000_body_and_backfill.sql`, ya aplicada en el proyecto real (15/11/2026).
+- **Fase 7 (rama `fase-7`):** export en JSON y CSV desde Ajustes, y servidor MCP remoto en el
+  mismo Worker (`/mcp`), con OAuth sobre el login de Supabase: lee todo y escribe peso,
+  cintura, circunferencias y notas. Probado contra Supabase local con `wrangler dev`. **El
+  import de Hevy está en pausa** hasta tener el `workouts.csv` real (decisiones ya tomadas en
+  `decisiones.md`, Pendiente). Sin tablas nuevas.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -57,8 +62,12 @@ Actions · Biome · Vitest + Playwright (WebKit).
 
 ## Comandos
 - `npm run dev` (:5173) · `npm run preview` (:4173: sirve `dist/` con el service worker).
-- `npm run verify`: lint (Biome) + tests (Vitest) + build (`tsc -b` + Vite). Es exactamente
-  lo que corren CI y el deploy: si pasa local, pasa allá.
+- `npm run verify`: lint (Biome) + tests (Vitest) + build (`tsc -b` + Vite) + bundle del
+  Worker (`wrangler deploy --dry-run`). Es exactamente lo que corren CI y el deploy: si pasa
+  local, pasa allá.
+- `npx wrangler dev` (:8787): el Worker con el MCP remoto. `.dev.vars` (no se commitea) lo
+  apunta al Supabase local. Después de tocar `wrangler.jsonc`:
+  `npx wrangler types worker/worker-configuration.d.ts`.
 - `npm run format`: Biome con `--write`. Biome no toca los `.md`.
 - `npm run icons`: regenera íconos y splash desde `public/icon.svg`
   (`pwa-assets.config.ts`). El generador imprime links con `-light-` en el nombre, pero los
@@ -72,6 +81,12 @@ Actions · Biome · Vitest + Playwright (WebKit).
   pasa, `npx wrangler deploy`. No hay tokens de Cloudflare en GitHub.
 - GitHub Actions corre `npm run verify` en cada PR y en `main`.
 - `public/_headers`: `/assets/*` inmutable; `sw.js` e `index.html` sin caché.
+- **El Worker (`worker/`) solo atiende `/mcp`, `/authorize`, `/token`, `/register` y
+  `/.well-known/*`** (`run_worker_first`); el resto son los archivos de la app. OAuth guarda
+  clientes y grants en el KV `OAUTH_KV`, que `wrangler deploy` crea solo la primera vez.
+- **Conectar Claude:** en los conectores de Claude (claude.ai o la app), agregar un conector
+  personalizado con `https://gym.<subdominio>.workers.dev/mcp`. Pide el email y la contraseña
+  de la app.
 - **Las versiones nuevas nunca recargan solas:** el service worker nuevo espera y la app
   muestra "Hay una versión nueva" hasta que se toca Actualizar. Además se busca versión
   nueva cada vez que la app vuelve a primer plano.
@@ -92,6 +107,8 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - **Para analizar los datos:** el MCP `supabase` de `.mcp.json` (proyecto
   `wuampfwqeqbqbbxdqzzq`, `read_only=true`) deja consultar con SQL. Se autentica una vez con
   `/mcp` en Claude Code. Para escribir esquema se usan migraciones, nunca el MCP.
+- **Desde la app de Claude:** el MCP remoto del Worker (`/mcp`) responde con el mismo dominio
+  que la app (estado, rutina de la semana, sesiones, historial de un ejercicio, cuerpo).
 - `public.heartbeat()` existe solo para el cron semanal (`.github/workflows/heartbeat.yml`)
   que evita la pausa del plan gratuito.
 
@@ -107,6 +124,9 @@ src/sync/            el único que habla con Supabase: tables.ts (mapeo), engine
                      resolver), start.ts (cuándo corre, login), status.ts (lo que ve la UI)
 src/features/session/model.ts   cada slot de la sesión en curso: ejercicio elegido, unidad, firma, progreso
 src/features/exercise/          la pantalla central: filas, panel inferior y hojas de opciones
+worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), authorize.ts (login),
+                     mcp.ts (tools), report.ts y writes.ts (puros, con tests), supabase.ts y
+                     data.ts (Supabase como Gonza). Reusa src/domain, la rutina y sync/tables.ts
 ```
 - Para probar en el navegador sin ensuciar la rotación, descartá la sesión en vez de
   terminarla. Antes del 7/12, terminar una sesión corre el inicio del mesociclo 1 a ese
@@ -114,7 +134,8 @@ src/features/exercise/          la pantalla central: filas, panel inferior y hoj
 
 ## Arquitectura: reglas duras
 - **La UI solo habla con Dexie. El único que habla con Supabase es el sync.** Nada de
-  fetch a Supabase desde una pantalla.
+  fetch a Supabase desde una pantalla. Fuera de la app, el MCP remoto habla con Supabase
+  **como Gonza**: su sesión va cifrada en el grant de OAuth y aplica RLS. Nunca `service_role`.
 - **Cada toque se escribe en Dexie al instante.** iOS puede matar la app en cualquier
   momento; no hay estado importante que viva solo en memoria (tampoco el descanso: se
   guarda como timestamp de fin).
@@ -230,6 +251,20 @@ src/features/exercise/          la pantalla central: filas, panel inferior y hoj
     última de la semana anterior y con la primera de todas.
   - Muslo, pantorrilla, brazo, pecho y hombros: una vez por mes, un valor cada una (siempre
     el mismo lado). "Toca medir" a los 30 días de la última.
+- **Export** (Ajustes › Datos):
+  - JSON: el respaldo completo, tal cual está en el teléfono, sin la marca `pending` y sin las
+    sesiones descartadas ni sus series. La sesión en curso entra.
+  - CSV: una fila por serie hecha de las sesiones terminadas (también con pendientes o
+    cargadas después), en orden cronológico y, dentro de la sesión, por orden de slot. Peso y
+    unidad como se anotaron (sin convertir); técnica solo si se hizo. Encabezados y valores en
+    español; coma como separador, punto decimal, UTF-8 con BOM.
+- **MCP remoto:**
+  - "Hoy" es la fecha de Buenos Aires: el Worker corre en UTC.
+  - Lee estado, rutina de una semana, catálogo, sesiones, una sesión, historial de un
+    ejercicio (por id o nombre; si hay varios, devuelve los candidatos) y cuerpo.
+  - Escribe con las reglas de la app: peso (hoy o ayer), cintura y circunferencias (hoy) y la
+    nota de una sesión terminada. Va con `updated_at` = ahora y el teléfono lo baja en el
+    próximo sync. Sesiones, series y mesociclos solo se tocan desde la app.
 
 ## Trampas de iOS (PWA instalada)
 - **No hay Background Sync.** El sync corre al abrir la app, en `visibilitychange`, en
@@ -259,6 +294,10 @@ src/features/exercise/          la pantalla central: filas, panel inferior y hoj
 - **Wake Lock se libera al ocultarse la app:** volver a pedirlo en `visibilitychange`.
 - **Supabase gratis pausa el proyecto tras 7 días sin actividad.** Se reactiva desde el
   dashboard; la app sigue andando sin conexión.
+- **La hoja de compartir solo abre dentro del toque:** `navigator.share` después de un `await`
+  falla. El export arma el archivo con datos que ya están en memoria (`useExportData`).
+- **El service worker no sirve `index.html` en las rutas del Worker**
+  (`navigateFallbackDenylist`): si no, el login del MCP abierto en Safari mostraría la app.
 
 ## UI
 - **El diseño manda:** [lienzos](https://claude.ai/artifact/JjepiWviYnpoD3prTXjbmP).
