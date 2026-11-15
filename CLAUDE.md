@@ -152,6 +152,8 @@ worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), author
   `updated_at`, `deleted_at` (borrado lógico) y marca de pendiente. Push = upsert
   idempotente; pull = cambios desde un cursor que asigna el server (secuencia, no el
   reloj del teléfono). Gana la última escritura por fila.
+- **La siembra del mesociclo 1 (base nueva) va con `updatedAt: 0`:** es la versión más vieja
+  posible. En un teléfono reinstalado gana la del servidor; con el servidor vacío, sube.
 - **Auth:** Supabase email + contraseña, `persistSession` y `autoRefreshToken`. Los
   signups quedan deshabilitados después de crear el usuario. RLS restringe cada tabla a
   `user_id = (select auth.uid())`. La app funciona sin sesión: la sesión solo la usa el

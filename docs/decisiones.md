@@ -149,6 +149,12 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 76 | **Desde `sm` las hojas son un modal centrado; se cierran con Esc o con un clic afuera** | Decisión de Gonza: es lo esperable con mouse. Solo cierra un clic que empieza y termina afuera, no una selección de texto que se suelta ahí. En el iPhone siguen siendo hojas inferiores y un toque afuera no las cierra. | Hoja inferior del ancho de la columna. | barato |
 | 77 | **Hover y manito solo con mouse (`hover: hover`), con una regla global en `index.css`; sin atajos de teclado** | Decisión de Gonza. Una regla cubre botones, links y filas con control nativo, sin acordarse en cada componente. En el iPhone no aplica. | Enter para completar la serie y Esc para volver: más código y riesgo de dispararse con el teclado del iPhone. `hover:` en cada componente. | barato |
 
+## Después de la fase 7 (15/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 75 | **La siembra del mesociclo 1 va con `updatedAt: 0`** | Una base nueva (reinstalar) lo sembraba con la hora actual y en el primer sync pisaba el inicio guardado en el servidor: volvía al 7/12. Como versión más vieja posible, el trigger ignora su push y el pull trae la del servidor. | Bajar antes de subir en el primer sync: toca el motor para un solo caso. | barato |
+
 ## Pendiente
 - **Import de Hevy (fase 7), en pausa:** falta el `workouts.csv` real de Gonza; no hay
   documentación oficial de las columnas. Ya decidido: los ejercicios de Hevy que no están en
