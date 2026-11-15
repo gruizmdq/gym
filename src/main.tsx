@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router/dom'
 import { router } from './app/router'
 import { recordRoutineVersion } from './data/actions'
+import { startRestPush } from './push/start'
 import { requestPersistentStorage } from './pwa/storage'
 import { UpdatePrompt } from './pwa/UpdatePrompt'
 import { startSync } from './sync/start'
@@ -11,6 +12,7 @@ import './index.css'
 void requestPersistentStorage()
 void recordRoutineVersion()
 startSync()
+startRestPush()
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Missing #root element in index.html')
