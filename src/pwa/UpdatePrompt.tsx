@@ -22,7 +22,7 @@ export function UpdatePrompt() {
   return (
     <div
       role="status"
-      className="fixed inset-x-4 top-[calc(env(safe-area-inset-top)+8px)] z-40 flex items-center gap-3 rounded-card bg-ink py-3 pr-3 pl-4 text-white shadow-float"
+      className="fixed inset-x-4 top-[calc(env(safe-area-inset-top)+8px)] z-40 mx-auto flex max-w-[calc(var(--container-app)-2rem)] items-center gap-3 rounded-card bg-ink py-3 pr-3 pl-4 text-white shadow-float"
     >
       <span className="flex-1 text-sub">Hay una versión nueva de la app.</span>
       <button

@@ -198,7 +198,7 @@ export function SummaryPage() {
     .map((s) => s.exercise.name)
 
   return (
-    <div className="flex min-h-dvh flex-col gap-3.5 px-4 pt-[calc(env(safe-area-inset-top)+10px)] pb-[calc(env(safe-area-inset-bottom)+16px)]">
+    <div className="mx-auto flex min-h-dvh max-w-app flex-col gap-3.5 px-4 pt-[calc(env(safe-area-inset-top)+10px)] pb-[calc(env(safe-area-inset-bottom)+16px)]">
       <header className="flex flex-col">
         <p className="font-semibold text-foot text-ink-3 uppercase tracking-[.03em]">
           {longDate(session.date)} · Sem {session.week}

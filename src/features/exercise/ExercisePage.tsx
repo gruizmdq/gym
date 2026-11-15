@@ -169,7 +169,7 @@ export function ExercisePage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col gap-2.5 px-4 pt-[env(safe-area-inset-top)]">
+    <div className="mx-auto flex min-h-dvh max-w-app flex-col gap-2.5 px-4 pt-[env(safe-area-inset-top)]">
       <nav className="-mx-2.5 flex h-11 items-center justify-between">
         <Link
           to="/session"
@@ -329,7 +329,7 @@ export function ExercisePage() {
 
       <section
         aria-label="Serie actual"
-        className="fixed inset-x-0 z-20 flex flex-col gap-3 rounded-t-[26px] bg-surface px-4 pt-3.5 shadow-panel"
+        className="fixed inset-x-0 z-20 mx-auto flex max-w-app flex-col gap-3 rounded-t-[26px] bg-surface px-4 pt-3.5 shadow-panel"
         style={{
           bottom: keyboard,
           paddingBottom: keyboard ? 12 : 'calc(env(safe-area-inset-bottom) + 12px)',

@@ -24,7 +24,7 @@ const WARNING =
   'm21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3ZM12 9v4M12 17h.01'
 const chip = 'flex h-[22px] shrink-0 items-center gap-1 rounded-full px-2 font-semibold text-[12px]'
 const screen =
-  'flex min-h-dvh flex-col gap-3 px-4 pt-[env(safe-area-inset-top)] pb-[calc(env(safe-area-inset-bottom)+16px)]'
+  'mx-auto flex min-h-dvh max-w-app flex-col gap-3 px-4 pt-[env(safe-area-inset-top)] pb-[calc(env(safe-area-inset-bottom)+16px)]'
 
 const round2 = (v: number) => Math.round(v * 100) / 100
 

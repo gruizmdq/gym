@@ -40,6 +40,9 @@ pará y preguntá.
   cintura, circunferencias y notas. Probado contra Supabase local con `wrangler dev`. **El
   import de Hevy está en pausa** hasta tener el `workouts.csv` real (decisiones ya tomadas en
   `decisiones.md`, Pendiente). Sin tablas nuevas.
+- **Mac (rama `desktop-layout`, sale de `fase-7`):** en pantallas anchas la app es una columna
+  de 402 px centrada, las hojas son modales y hay hover con mouse. En el iPhone no cambia nada.
+- **Datos cargados por SQL:** 273 pesajes históricos (11/10/2025 al 15/11/2026), el 15/11/2026.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -104,9 +107,13 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - Columnas en snake_case con los mismos nombres que la app. Cada tabla: `user_id` con RLS,
   `updated_at` (hora del teléfono: gana la más nueva; el trigger ignora una más vieja),
   `deleted_at` (borrado lógico, sin `delete`) y `seq` (cursor del pull).
-- **Para analizar los datos:** el MCP `supabase` de `.mcp.json` (proyecto
-  `wuampfwqeqbqbbxdqzzq`, `read_only=true`) deja consultar con SQL. Se autentica una vez con
-  `/mcp` en Claude Code. Para escribir esquema se usan migraciones, nunca el MCP.
+- **Para analizar y cargar datos:** el MCP `supabase` de `.mcp.json` (proyecto
+  `wuampfwqeqbqbbxdqzzq`) deja consultar y escribir con SQL. Se autentica una vez con `/mcp`
+  en Claude Code. **El esquema se cambia solo con migraciones, nunca con el MCP.**
+  - Una escritura por SQL tiene que llegar al teléfono: `updated_at = now()` (el trigger le
+    asigna `seq`) y `user_id` explícito (por SQL no hay `auth.uid()`).
+  - Nada de `delete`: el pull no ve filas borradas. Se borra con `deleted_at = now()`.
+  - Una carga no pisa lo que ya hay (`on conflict do nothing`), salvo que Gonza lo pida.
 - **Desde la app de Claude:** el MCP remoto del Worker (`/mcp`) responde con el mismo dominio
   que la app (estado, rutina de la semana, sesiones, historial de un ejercicio, cuerpo).
 - `public.heartbeat()` existe solo para el cron semanal (`.github/workflows/heartbeat.yml`)
@@ -310,6 +317,12 @@ worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), author
   principal de 56 pt.
 - **Toda operación async tiene indicador visible.** Para cargar, skeletons, nunca
   spinners. El estado vacío lleva una acción; el estado de error lleva "Reintentar".
+- **Pantallas anchas (la Mac):** la app es una columna de `max-w-app` (402 px, el ancho del
+  iPhone 17) centrada, sin pantallas aparte.
+  - Todo lo `fixed` se acota a la columna: `mx-auto max-w-app` si va de borde a borde,
+    `mx-auto max-w-[calc(var(--container-app)-2rem)]` si flota a 16 px del borde.
+  - Las hojas pasan a modal centrado desde `sm` y se cierran con un clic afuera.
+  - Hover y manito salen de una regla global en `index.css`, solo con mouse (`hover: hover`).
 - **Textos:**
   - Voseo. Si salió bien, decí qué pasó; si falló, hacete cargo y decí qué hacer.
   - Sin emojis y sin "exitosamente".

@@ -40,7 +40,7 @@ export function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col gap-7 bg-surface px-6 pt-[calc(env(safe-area-inset-top)+64px)] pb-[calc(env(safe-area-inset-bottom)+16px)]">
+    <div className="mx-auto flex min-h-dvh max-w-app flex-col gap-7 bg-surface px-6 pt-[calc(env(safe-area-inset-top)+64px)] pb-[calc(env(safe-area-inset-bottom)+16px)]">
       <div className="flex flex-col items-start gap-[18px]">
         <div
           className="flex size-[76px] items-center justify-center rounded-[18px] bg-accent text-white"
