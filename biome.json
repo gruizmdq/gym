@@ -42,5 +42,15 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["rutina/**"],
+      "json": {
+        "formatter": {
+          "lineWidth": 320
+        }
+      }
+    }
+  ]
 }

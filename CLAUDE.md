@@ -16,8 +16,10 @@ pará y preguntá.
 - **Fase 0, lienzos:** [Gym · Lienzos](https://claude.ai/artifact/JjepiWviYnpoD3prTXjbmP).
   Aprobados por Gonza el 14/11/2026. Después se agregaron la unidad por ejercicio,
   terminar con pendientes y la carga tardía.
-- **Fase 1 (rama `fase-1`, PR a `main`):** base de la PWA, CI y config de deploy. Repo en
-  `gruizmdq/gym`; Cloudflare Workers Builds conectado. Falta mergear y probar en el iPhone.
+- **Fase 1:** mergeada y desplegada en Cloudflare. Falta probarla en el iPhone.
+- **Fase 2 (rama `fase-2`):** rutina como dato, dominio (mesociclo, rotación, prescripción
+  semanal) con tests, Dexie, Hoy, una sesión mínima (empezar, terminar, descartar, saltear
+  el Día 5) y Ajustes (plan, inicio y semana). El registro de series es la fase 3.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -60,6 +62,19 @@ Actions · Biome · Vitest + Playwright (WebKit).
   nueva cada vez que la app vuelve a primer plano.
 - La versión que está corriendo (commit corto) se ve en Ajustes.
 
+## Estructura
+```
+rutina/rutina.json   la rutina (dato); la valida src/rutina/schema.test.ts
+src/dominio/         reglas puras con tests: fechas, mesociclo, rotación, prescripción
+src/datos/           Dexie: db.ts (tablas), acciones.ts (toda escritura), consultas.ts (lecturas vivas)
+src/features/<x>/    pantallas; entrenamiento/estado.ts junta dominio + datos para Hoy, sesión y Ajustes
+src/ui/              piezas sin dominio: Pagina, Hoja (<dialog>), TabBar, formato, botones
+src/pwa/             service worker y almacenamiento persistente
+```
+- Para probar en el navegador sin ensuciar la rotación, descartá la sesión en vez de
+  terminarla. Antes del 7/12, terminar una sesión corre el inicio del mesociclo 1 a ese
+  día: se vuelve a poner en Ajustes.
+
 ## Arquitectura: reglas duras
 - **La UI solo habla con Dexie. El único que habla con Supabase es el sync.** Nada de
   fetch a Supabase desde una pantalla.
@@ -76,11 +91,14 @@ Actions · Biome · Vitest + Playwright (WebKit).
   signups quedan deshabilitados después de crear el usuario. RLS restringe cada tabla a
   `user_id = (select auth.uid())`. La app funciona sin sesión: la sesión solo la usa el
   sync.
-- **Rutina:** `routine/routine.json`, validada con Zod en el build (si no valida, no hay
-  deploy). La versión es el hash del contenido. Al abrir, la app guarda la versión en
+- **Rutina:** `rutina/rutina.json`, con la forma de `src/rutina/schema.ts` (Zod). El test
+  `src/rutina/schema.test.ts` la valida: si no valida, no hay deploy. Para editarla:
+  cambiá el JSON y corré `npm run test`; el error dice qué día, slot y campo fallan.
+  La versión es el hash del contenido. Al abrir, la app guarda la versión en
   `routine_versions` (local y Supabase); cada sesión guarda con qué versión se hizo.
   Cada plan lista sus días completos, **sin herencia**. Los días tienen una clave
-  compartida entre planes (`lower-a`).
+  compartida entre planes (`lower-a`). Los avisos por semana (test de banca) son datos
+  del día, no código.
 
 ## Reglas de dominio
 - **Rotación:** "hoy toca" es la sesión siguiente a la última completada (por fecha), en la secuencia
@@ -105,7 +123,8 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - **Principal de Lower A:** alterna péndulo (mesociclos impares) y sentadilla de palanca
   (pares). La prensa queda fija.
 - **Firma de prescripción** = clave de día + ejercicio realmente usado + rango de reps +
-  cadencia + técnica del slot + unilateral.
+  cadencia + técnica del slot. Unilateral es parte del ejercicio: la extensión unilateral
+  es otro ejercicio del catálogo, con su propio historial.
 - **El historial sigue al ejercicio, nunca al lugar en la rutina.** Cambiar de rutina o
   reemplazar un ejercicio no pierde ni mezcla historial. Los ids del catálogo son estables:
   nunca se renombran ni se reutilizan para otro ejercicio. Usar una alternativa en la
@@ -146,7 +165,7 @@ Actions · Biome · Vitest + Playwright (WebKit).
     con ladrillos y no suman al volumen en kg.
   - El incremento mínimo va en la unidad del ejercicio (en ladrillos, 1).
   - Un solo gimnasio: la máquina queda implícita en el ejercicio.
-  - Mancuernas: peso por mancuerna. Dominadas: lastre (0 = peso corporal).
+  - Mancuernas: peso por mancuerna. Ab wheel: sin carga, solo reps.
   - El peso corporal va siempre en kg.
 - **Cuerpo:**
   - Peso diario, con promedio por semana de lunes a domingo y comparación con la semana
