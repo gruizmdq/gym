@@ -139,6 +139,7 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 71 | **Un proveedor OAuth por origen** | La URL del MCP va dentro de cada token: así anda en workers.dev, en las previews y en localhost sin configurar la URL. | Fijar la URL en `wrangler.jsonc`. | barato |
 | 72 | **SDK de MCP v2 (`@modelcontextprotocol/server`) sin estado, y `@cloudflare/workers-oauth-provider`** | El SDK v2 trae soporte para Workers y pocas dependencias. Sin estado no hacen falta Durable Objects. | El paquete `agents` de Cloudflare: más pesado para lo mismo. | barato |
 | 73 | **`verify` también empaqueta el Worker (`wrangler deploy --dry-run`)** | Un error de bundle del MCP aparece en el PR y no recién en el deploy. | Dejarlo para Workers Builds. | barato |
+| 74 | **El MCP de Supabase queda con escritura (antes `read_only=true`)** | Decisión de Gonza, después de cargar el historial de peso: cargas y correcciones de datos sin pasar por la CLI. El esquema sigue yendo solo por migraciones. | Solo lectura, habilitando la escritura un rato cuando hace falta (lo recomendado). | barato |
 
 ## Pendiente
 - **Import de Hevy (fase 7), en pausa:** falta el `workouts.csv` real de Gonza; no hay
