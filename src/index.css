@@ -93,6 +93,32 @@
     -webkit-touch-callout: none;
   }
 
+  /* With a mouse, what can be clicked shows the hand and a light tint. Touch screens don't
+     match (hover: hover): on the iPhone nothing changes. The labels are rows with a
+     transparent native control on top. */
+  @media (hover: hover) {
+    :is(
+        button:enabled,
+        a[href],
+        [role="button"],
+        label:has(select, input[type="date"], input[type="radio"])
+      ) {
+      cursor: pointer;
+    }
+
+    :is(
+        button:enabled,
+        a[href],
+        [role="button"],
+        label:has(select, input[type="date"], input[type="radio"])
+      ):hover {
+      background-image: linear-gradient(
+        --alpha(var(--color-ink) / 4%),
+        --alpha(var(--color-ink) / 4%)
+      );
+    }
+  }
+
   /* Below 16 px, iOS zooms in when the field gets focus. */
   input,
   textarea,
