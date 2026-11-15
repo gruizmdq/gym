@@ -70,6 +70,8 @@ export default defineConfig({
         // worker, opening the sign-in page would show the app instead.
         navigateFallbackDenylist: [/^\/(mcp|authorize|token|register)(\/|$)/, /^\/\.well-known\//],
         cleanupOutdatedCaches: true,
+        // The push at the end of the rest (phase 8): its handlers live in public/push-sw.js.
+        importScripts: ['push-sw.js'],
       },
     }),
   ],

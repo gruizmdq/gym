@@ -69,6 +69,13 @@ export function startSync(): void {
   })
 }
 
+// For the Worker (the push at the end of the rest): the same session the sync uses.
+export async function accessToken(): Promise<string | null> {
+  if (!supabase) return null
+  const { data } = await supabase.auth.getSession()
+  return data.session?.access_token ?? null
+}
+
 export async function signIn(email: string, password: string): Promise<string | null> {
   if (!supabase) return 'La sincronización no está configurada en esta versión.'
   const { error } = await supabase.auth.signInWithPassword({ email, password })

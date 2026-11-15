@@ -9,4 +9,6 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL?: string
   /** Publishable key (public by design: it ships inside the app). Never the secret. */
   readonly VITE_SUPABASE_PUBLISHABLE_KEY?: string
+  /** VAPID public key of the push at the end of the rest. Without it there's no alert. */
+  readonly VITE_VAPID_PUBLIC_KEY?: string
 }

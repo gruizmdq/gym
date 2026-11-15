@@ -8,6 +8,7 @@ import { Page } from '../../ui/Page'
 import { AccountSection } from '../account/SyncStatus'
 import { buildTraining } from '../training/state'
 import { DataSection } from './DataSection'
+import { RestAlertRow } from './RestAlertRow'
 
 const chevron = (
   <svg
@@ -113,6 +114,8 @@ export function SettingsPage() {
             {e.main && (
               <Row label={`Principal de ${e.main.day.name}`} value={e.main.exercise.name} />
             )}
+
+            <RestAlertRow />
           </div>
           <p className="px-4 pt-2 text-foot text-ink-3">
             La semana avanza sola cada 7 días; si te atrasaste, cambiala acá. El plan y la fecha de
