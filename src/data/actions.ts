@@ -12,7 +12,7 @@ import { weekOf } from '../domain/prescription'
 import type { LoggedSet, Unit } from '../domain/sets'
 import { routine } from '../routine/routine'
 import { scheduleSync } from '../sync/schedule'
-import { db, type Session, type Syncable, setId } from './db'
+import { type Circumferences, db, type Session, type Syncable, setId } from './db'
 
 // Every write goes through here: each tap lands in IndexedDB right away, marked as
 // pending to push, and a sync gets scheduled.
@@ -36,9 +36,14 @@ export async function recordRoutineVersion(): Promise<void> {
   scheduleSync()
 }
 
-async function newSession(plan: string, day: string, status: Session['status']): Promise<string> {
+async function newSession(
+  plan: string,
+  day: string,
+  status: Session['status'],
+  backfillDate?: IsoDate,
+): Promise<string> {
   const now = Date.now()
-  const date = isoDate(new Date(now))
+  const date = backfillDate ?? isoDate(new Date(now))
   const meso = currentMesocycle(await db.mesocycles.toArray(), date, WEEKS)
   if (!meso) throw new Error('No mesocycle is configured')
   const id = crypto.randomUUID()
@@ -55,10 +60,28 @@ async function newSession(plan: string, day: string, status: Session['status']):
     startedAt: now,
     ...(status === 'skipped' ? { finishedAt: now } : {}),
     sortOrder: now,
+    ...(backfillDate ? { backfilled: true } : {}),
     ...stamp(),
   })
   return id
 }
+
+// A session for a past date: it takes that date's mesocycle, week and plan. Only if there's no
+// session in progress.
+export async function startBackfill(date: IsoDate, plan: string, day: string): Promise<string> {
+  const id = await db.transaction('rw', db.sessions, db.mesocycles, async () => {
+    if (await db.sessions.where('status').equals('in-progress').first()) {
+      throw new Error('There is a session in progress')
+    }
+    return newSession(plan, day, 'in-progress', date)
+  })
+  scheduleSync()
+  return id
+}
+
+// A backfilled session goes at the end of its day: after anything really done that day, before
+// anything of the next one.
+const endOfDay = (date: IsoDate) => new Date(`${date}T23:59:59.999`).getTime()
 
 export async function startSession(plan: string, day: string): Promise<string> {
   const id = await db.transaction('rw', db.sessions, db.mesocycles, async () => {
@@ -94,7 +117,7 @@ export async function finishSession(id: string): Promise<void> {
     await db.sessions.update(id, {
       status: 'finished',
       finishedAt: now,
-      sortOrder: now,
+      sortOrder: session.backfilled ? endOfDay(session.date) : now,
       rest: null,
       ...stamp(),
     })
@@ -263,5 +286,26 @@ export async function configureExercise(
   step: number,
 ): Promise<void> {
   await db.exerciseSettings.put({ exerciseId, unit, step, ...stamp() })
+  scheduleSync()
+}
+
+// --- Body ---------------------------------------------------------------------------------------
+
+// One weighing per day: saving again replaces it.
+export async function saveWeight(date: IsoDate, kg: number): Promise<void> {
+  await db.weights.put({ date, kg, ...stamp() })
+  scheduleSync()
+}
+
+export async function saveWaist(date: IsoDate, measurements: number[]): Promise<void> {
+  await db.waists.put({ date, measurements, ...stamp() })
+  scheduleSync()
+}
+
+export async function saveCircumferences(
+  date: IsoDate,
+  values: Omit<Circumferences, 'date' | keyof Syncable>,
+): Promise<void> {
+  await db.circumferences.put({ date, ...values, ...stamp() })
   scheduleSync()
 }

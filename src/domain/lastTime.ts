@@ -44,7 +44,7 @@ export interface Reference {
   sets: PastSet[]
 }
 
-function newestFirst(a: PastSession, b: PastSession): number {
+export function newestFirst(a: PastSession, b: PastSession): number {
   if (a.date !== b.date) return a.date < b.date ? 1 : -1
   return b.sortOrder - a.sortOrder
 }
@@ -52,14 +52,26 @@ function newestFirst(a: PastSession, b: PastSession): number {
 export function lastTime(
   sessions: PastSession[],
   sets: PastSet[],
-  wanted: { exerciseId: string; day: string; signature: string; currentSession: string },
+  wanted: {
+    exerciseId: string
+    day: string
+    signature: string
+    currentSession: string
+    // A backfilled session only looks at what came before its date.
+    before?: IsoDate
+  },
 ): { primary: Reference | null; secondary: Reference | null } {
   // History follows the exercise: its done sets in finished sessions count.
   const own = sets.filter(
     (s) => s.done && s.exerciseId === wanted.exerciseId && s.sessionId !== wanted.currentSession,
   )
   const candidates = sessions
-    .filter((s) => s.status === 'finished' && own.some((o) => o.sessionId === s.id))
+    .filter(
+      (s) =>
+        s.status === 'finished' &&
+        (!wanted.before || s.date < wanted.before) &&
+        own.some((o) => o.sessionId === s.id),
+    )
     .sort(newestFirst)
   const setsOf = (session: PastSession, filter: (s: PastSet) => boolean = () => true) =>
     own.filter((s) => s.sessionId === session.id && filter(s)).sort((a, b) => a.number - b.number)

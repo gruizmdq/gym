@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router'
 import { SignInPage } from '../features/account/SignInPage'
 import { BodyPage } from '../features/body/BodyPage'
 import { ExercisePage } from '../features/exercise/ExercisePage'
+import { ExerciseHistoryPage } from '../features/history/ExerciseHistoryPage'
 import { HistoryPage } from '../features/history/HistoryPage'
 import { SessionLayout, SessionPage } from '../features/session/SessionPage'
 import { SettingsPage } from '../features/settings/SettingsPage'
@@ -30,5 +31,7 @@ export const router = createBrowserRouter([
     ],
   },
   { path: '/summary/:id', Component: SummaryPage },
+  // One exercise's history is full screen, like the summary: no tab bar.
+  { path: '/history/exercise/:exerciseId', Component: ExerciseHistoryPage },
   { path: '/sign-in', Component: SignInPage },
 ])

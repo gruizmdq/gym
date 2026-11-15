@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { skipDay, startSession } from '../../data/actions'
-import { useMesocycles, useSessions } from '../../data/queries'
+import { useMesocycles, useSessions, useWeights } from '../../data/queries'
 import { isoDate } from '../../domain/dates'
 import { routine } from '../../routine/routine'
 import { button } from '../../ui/buttons'
@@ -9,8 +9,9 @@ import { longDate } from '../../ui/format'
 import { Page } from '../../ui/Page'
 import { Sheet } from '../../ui/Sheet'
 import { SyncBadge } from '../account/SyncStatus'
+import { WeightSheet } from '../body/WeightSheet'
 import { buildTraining } from '../training/state'
-import { ExerciseList, NewMesocycleCard, UpNextCard, WeekCard } from './cards'
+import { ExerciseList, NewMesocycleCard, UpNextCard, WeekCard, WeightCard } from './cards'
 
 // The action bar sits above the floating tab bar.
 const aboveTabBar = 'bottom-[calc(max(12px,env(safe-area-inset-bottom)-10px)+76px)]'
@@ -19,7 +20,9 @@ export function TodayPage() {
   const navigate = useNavigate()
   const records = useMesocycles()
   const sessions = useSessions()
+  const weights = useWeights()
   const [confirmSkip, setConfirmSkip] = useState(false)
+  const [weighing, setWeighing] = useState(false)
   const today = isoDate(new Date())
 
   const e = records && sessions ? buildTraining(routine, records, sessions, today) : undefined
@@ -63,6 +66,7 @@ export function TodayPage() {
           <NewMesocycleCard e={e} />
         )}
         <UpNextCard e={e} />
+        <WeightCard weights={weights} today={today} onOpen={() => setWeighing(true)} />
         <WeekCard e={e} />
         <ExerciseList e={e} />
         <div className="h-36" aria-hidden="true" />
@@ -98,6 +102,10 @@ export function TodayPage() {
           </button>
         </div>
       </Sheet>
+
+      {weighing && weights && (
+        <WeightSheet weights={weights} today={today} onClose={() => setWeighing(false)} />
+      )}
     </>
   )
 }

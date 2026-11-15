@@ -6,15 +6,17 @@ import { TECHNIQUE_LABEL, weekSummary } from '../../domain/prescription'
 import { routine } from '../../routine/routine'
 import { button } from '../../ui/buttons'
 import { useWakeLock } from '../../ui/device'
-import { clock, range } from '../../ui/format'
+import { clock, range, shortDate } from '../../ui/format'
 import { Sheet } from '../../ui/Sheet'
 import { useNow } from '../../ui/useNow'
 import { findPlan, nextDay } from '../training/state'
 import { isPending, nextSlot, sessionDay, sessionSlots } from './model'
 
-// While a session is open, the screen stays on.
+// While a session is open, the screen stays on (not while logging a past one).
 export function SessionLayout() {
-  useWakeLock(true)
+  const sessions = useSessions()
+  const backfilling = sessions?.find((s) => s.status === 'in-progress')?.backfilled ?? false
+  useWakeLock(sessions !== undefined && !backfilling)
   return <Outlet />
 }
 
@@ -78,13 +80,19 @@ export function SessionPage() {
             <path d="m6 9 6 6 6-6" />
           </svg>
         </button>
-        <span
-          className="font-num font-semibold text-ink-2 text-sub"
-          role="timer"
-          aria-label="Tiempo de la sesión"
-        >
-          {clock(now - session.startedAt)}
-        </span>
+        {session.backfilled ? (
+          <span className="font-semibold text-ink-2 text-sub">
+            Cargando el {shortDate(session.date)}
+          </span>
+        ) : (
+          <span
+            className="font-num font-semibold text-ink-2 text-sub"
+            role="timer"
+            aria-label="Tiempo de la sesión"
+          >
+            {clock(now - session.startedAt)}
+          </span>
+        )}
         <button
           type="button"
           onClick={() => setFinishing(true)}

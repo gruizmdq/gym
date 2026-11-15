@@ -70,8 +70,9 @@ export function buildTraining(
   const mesocycle = inProgress?.mesocycle ?? meso.number
   const exercises = dayExercises(routine, day, week, mesocycle)
 
+  // A backfilled session has no real duration.
   const last = sessions
-    .filter((s) => s.day === day.key && s.status === 'finished' && s.finishedAt)
+    .filter((s) => s.day === day.key && s.status === 'finished' && s.finishedAt && !s.backfilled)
     .sort((a, b) => b.sortOrder - a.sortOrder)[0]
 
   return {

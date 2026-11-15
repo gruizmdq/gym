@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router'
 import { saveNotes } from '../../data/actions'
 import type { SetRecord } from '../../data/db'
 import {
@@ -126,6 +126,9 @@ function Stat({
 export function SummaryPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  // Opened from History, "Cerrar" goes back there; after finishing a session, to Today.
+  const fromHistory = (useLocation().state as { fromHistory?: boolean } | null)?.fromHistory
+
   const sessions = useSessions()
   const session = sessions?.find((s) => s.id === id)
   const sets = useSessionSets(id)
@@ -208,7 +211,12 @@ export function SummaryPage() {
       <dl className="grid grid-cols-2 gap-2.5" aria-label="Números de la sesión">
         <Stat
           label="Duración"
-          value={session.finishedAt ? duration(session.finishedAt - session.startedAt) : '—'}
+          value={
+            session.finishedAt && !session.backfilled
+              ? duration(session.finishedAt - session.startedAt)
+              : '—'
+          }
+          {...(session.backfilled ? { note: 'Cargada después' } : {})}
         />
         <Stat
           label="Volumen"
@@ -287,7 +295,7 @@ export function SummaryPage() {
       <button
         type="button"
         className={button.primary}
-        onClick={() => navigate('/', { replace: true })}
+        onClick={() => (fromHistory ? navigate(-1) : navigate('/', { replace: true }))}
       >
         Cerrar
       </button>

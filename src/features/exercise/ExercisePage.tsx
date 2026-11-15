@@ -88,6 +88,7 @@ export function ExercisePage() {
     day: day.key,
     signature: current.signature,
     currentSession: session.id,
+    ...(session.backfilled ? { before: session.date } : {}),
   })
   const rows = buildRows(
     {
@@ -138,7 +139,8 @@ export function ExercisePage() {
       await saveRow(target, row)
     } else {
       const after = rows.map((r) => (rowKey(r) === rowKey(row) ? { ...r, done: true } : r))
-      const closes = completesSet(after, row.number)
+      // Logging a past session has no rest.
+      const closes = completesSet(after, row.number) && !session.backfilled
       await completeRow(target, row, closes ? current.slot.rest : null)
     }
     setSelection(null)

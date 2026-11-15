@@ -34,12 +34,15 @@ describe('opening the database', () => {
 
     await db.open()
     expect(db.tables.map((t) => t.name).sort()).toEqual([
+      'circumferences',
       'exerciseSettings',
       'mesocycles',
       'meta',
       'routines',
       'sessions',
       'sets',
+      'waists',
+      'weights',
     ])
     expect(await db.mesocycles.toArray()).toEqual([
       expect.objectContaining({ ...INITIAL_MESOCYCLE, pending: 1 }),

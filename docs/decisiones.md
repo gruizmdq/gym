@@ -114,6 +114,18 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 56 | **"Para la próxima" del resumen: los que suben y los que quedaron a exactamente 1 rep** | Como en el lienzo: la lista queda corta y muestra lo que está por pasar. Una serie sin cadencia no es "a 1 rep". | Todos los ejercicios; solo los que suben. | barato |
 | 57 | **El aviso de subir se aplica con un toque y el estado "aplicado" se deriva de los pesos** | Es una sugerencia: no cambia nada solo. Derivarlo evita guardar una marca más. | Guardar si se aplicó. | barato |
 
+## Fase 6 (15/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 58 | **Una semana necesita 3 pesajes para compararse y contar para el aviso de +0,4** | Con 1 o 2, un día con agua o sal mueve demasiado el promedio. | Contar cualquier semana; pedir 4. | barato |
+| 59 | **El aviso de +0,4 mira solo semanas terminadas** | La semana en curso cambia día a día: el aviso aparecería y desaparecería. | Incluir la semana en curso. | barato |
+| 60 | **El peso se carga o edita hoy y ayer; más atrás no** | Cubre el olvido habitual sin agregar un selector de fecha. | Solo hoy; cualquier fecha. | barato |
+| 61 | **Circunferencias: las 5, un valor cada una, "Toca medir" a los 30 días** | Medir siempre del mismo lado alcanza para ver la tendencia. | Ambos lados en las de a pares. | barato |
+| 62 | **Carga tardía desde el inicio del mesociclo 1 hasta ayer; no con una sesión en curso** | Antes del arranque no hay mesociclo ni semana que asignar. Una sola sesión en curso a la vez. | Cualquier fecha; un límite de 14 días. | barato |
+| 63 | **Una sesión cargada después se ordena al final de su día y su vez anterior solo mira lo anterior a esa fecha** | Así la rotación, el resumen y el prellenado la tratan como si se hubiera hecho ese día. | Ordenarla por el momento en que se cargó. | medio |
+| 64 | **Historial: "n de m" cuenta el Día 5 salteado; el historial de un ejercicio se agrupa por día de rutina** | El Día 5 salteado cuenta para la rotación. Por día de rutina se ve el progreso comparable; otra prescripción del mismo día aparece como "No equivalente". | Agrupar por firma exacta. | barato |
+
 ## Pendiente
 - **Probar la fase 1 en el iPhone** después del primer deploy: barra de estado, splash,
   tab bar sobre la barra de inicio y modo avión.

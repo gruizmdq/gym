@@ -32,6 +32,10 @@ pará y preguntá.
 - **Fase 5 (rama `fase-5`):** progresión doble (aviso con "Subir" en el ejercicio y "Para la
   próxima" en el resumen) y alerta de retroceso en el resumen. La referencia secundaria y el
   aviso de no equivalente ya estaban desde la fase 3.
+- **Fase 6 (rama `fase-6`, sale de `fase-5`):** Cuerpo (peso, cintura, circunferencias),
+  historial de sesiones y de ejercicio con gráficos, y carga tardía. Dexie v6 y la migración
+  `20261115000000_body_and_backfill.sql` (probada en local; falta aplicarla al proyecto real
+  con `npx supabase db push --remote`).
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -197,6 +201,10 @@ src/features/exercise/          la pantalla central: filas, panel inferior y hoj
 - **Carga tardía:** se puede cargar una sesión con fecha pasada. El día se sugiere según
   la rotación a esa fecha. "Hoy toca" y la semana del mesociclo se recalculan con la fecha
   de cada sesión. En la carga no hay descanso ni Wake Lock.
+  - Fechas: desde el inicio del mesociclo 1 hasta ayer. No se puede con una sesión en curso.
+  - La sesión toma el mesociclo, la semana y el plan de esa fecha, queda marcada `backfilled`
+    y al terminarla se ordena al final de ese día. La vez anterior solo mira lo anterior a
+    esa fecha. En el historial dice "cargada después" en vez de la duración.
 - **Test de banca:** en Upper A de la semana 5 aparece el aviso "banca primero y pesada".
 - **Unilaterales:**
   - Va primero el lado débil: extensión, izquierda; curl femoral, derecha. Donde la rutina
@@ -216,8 +224,13 @@ src/features/exercise/          la pantalla central: filas, panel inferior y hoj
 - **Cuerpo:**
   - Peso diario, con promedio por semana de lunes a domingo y comparación con la semana
     anterior. Objetivo +0,25 kg/semana; aviso si pasa +0,4 tres semanas seguidas.
-  - Cintura semanal: se guardan las 3 mediciones y el promedio se calcula.
-  - Muslo, pantorrilla, brazo, pecho y hombros: una vez por mes.
+    - Un pesaje por día; se carga o edita el de hoy y el de ayer.
+    - Una semana necesita 3 pesajes para compararse y para el aviso. El aviso mira solo
+      semanas terminadas.
+  - Cintura semanal: se guardan las 3 mediciones y el promedio se calcula. Se compara con la
+    última de la semana anterior y con la primera de todas.
+  - Muslo, pantorrilla, brazo, pecho y hombros: una vez por mes, un valor cada una (siempre
+    el mismo lado). "Toca medir" a los 30 días de la última.
 
 ## Trampas de iOS (PWA instalada)
 - **No hay Background Sync.** El sync corre al abrir la app, en `visibilitychange`, en

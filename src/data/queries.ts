@@ -31,3 +31,20 @@ export function useExerciseSettings() {
     return new Map(settings.map((s) => [s.exerciseId, s]))
   })
 }
+
+export function useWeights() {
+  return useLiveQuery(() => db.weights.toArray())
+}
+
+export function useWaists() {
+  return useLiveQuery(() => db.waists.toArray())
+}
+
+export function useCircumferences() {
+  return useLiveQuery(() => db.circumferences.toArray())
+}
+
+// Every logged set: the history adds up volume per session and lists the exercises done.
+export function useAllSets() {
+  return useLiveQuery(() => db.sets.toArray())
+}
