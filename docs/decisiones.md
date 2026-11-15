@@ -126,7 +126,31 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 63 | **Una sesión cargada después se ordena al final de su día y su vez anterior solo mira lo anterior a esa fecha** | Así la rotación, el resumen y el prellenado la tratan como si se hubiera hecho ese día. | Ordenarla por el momento en que se cargó. | medio |
 | 64 | **Historial: "n de m" cuenta el Día 5 salteado; el historial de un ejercicio se agrupa por día de rutina** | El Día 5 salteado cuenta para la rotación. Por día de rutina se ve el progreso comparable; otra prescripción del mismo día aparece como "No equivalente". | Agrupar por firma exacta. | barato |
 
+## Fase 7 (15/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 65 | **Export: el JSON es el respaldo completo; el CSV, una fila por serie hecha** | Como en el lienzo (Ajustes › Datos). El CSV es para una planilla; el cuerpo queda en el JSON. | Un segundo CSV con el cuerpo. | barato |
+| 66 | **El export se arma con datos ya en memoria y se comparte con la hoja de iOS; si no se puede, se descarga** | iOS solo abre la hoja si `navigator.share` se llama dentro del toque, sin esperar a IndexedDB. | Leer IndexedDB al tocar: la hoja fallaría. Una hoja intermedia con "Compartir": un toque más. | barato |
+| 67 | **El MCP remoto vive en el mismo Worker que la app** | Un deploy y un dominio. `run_worker_first` deja los archivos de la app fuera del Worker. | Un Worker aparte: otro deploy y otra URL. | barato |
+| 68 | **OAuth con el login de Supabase; escribir la contraseña es el consentimiento** | Decisión de Gonza: tiene que andar en la app de Claude, que necesita OAuth. Sin una sesión propia del Worker no hay nada que falsificar desde otro sitio. La página muestra el cliente y a qué host va el acceso. | Token en el header: solo sirve en Claude Code. URL secreta: si se filtra, se leen los datos. | medio |
+| 69 | **El MCP lee y escribe como Gonza: su sesión de Supabase va cifrada en el grant y aplica RLS** | No hay ningún secreto de Supabase en Cloudflare. El token de acceso vive menos que el de Supabase, y al refrescarlo se refresca la sesión. Si Supabase la rechaza, el grant se revoca y Claude pide entrar de nuevo. | `service_role` como secreto del Worker, filtrando por `user_id` en el código. | medio |
+| 70 | **Escrituras: peso, cintura, circunferencias y notas, con las reglas de la app** | Decisión de Gonza. Sesiones, series y mesociclos tienen reglas (rotación, firma, inicio del mesociclo) que viven en la app. | Solo lectura. | barato |
+| 71 | **Un proveedor OAuth por origen** | La URL del MCP va dentro de cada token: así anda en workers.dev, en las previews y en localhost sin configurar la URL. | Fijar la URL en `wrangler.jsonc`. | barato |
+| 72 | **SDK de MCP v2 (`@modelcontextprotocol/server`) sin estado, y `@cloudflare/workers-oauth-provider`** | El SDK v2 trae soporte para Workers y pocas dependencias. Sin estado no hacen falta Durable Objects. | El paquete `agents` de Cloudflare: más pesado para lo mismo. | barato |
+| 73 | **`verify` también empaqueta el Worker (`wrangler deploy --dry-run`)** | Un error de bundle del MCP aparece en el PR y no recién en el deploy. | Dejarlo para Workers Builds. | barato |
+
 ## Pendiente
+- **Import de Hevy (fase 7), en pausa:** falta el `workouts.csv` real de Gonza; no hay
+  documentación oficial de las columnas. Ya decidido: los ejercicios de Hevy que no están en
+  el catálogo se agregan a `routine.json` como ejercicios sin slot, con id estable. Si el
+  título del entreno corresponde a un día de la rutina, la sesión es referencia "no
+  equivalente" de ese día y prellena la semana 1. Solo entrenamientos (no las mediciones).
+  Con el archivo: tablas de casos (series de aproximación, drop sets, unilaterales, fechas,
+  duplicados al importar dos veces, rotación) y después el código.
+- **Primer deploy con el Worker:** confirmar que Workers Builds crea el KV `OAUTH_KV`. Si
+  falla por permisos, se crea en el dashboard y su id va en `wrangler.jsonc`. Después,
+  conectar Claude con `https://gym.<subdominio>.workers.dev/mcp`.
 - **Probar la fase 1 en el iPhone** después del primer deploy: barra de estado, splash,
   tab bar sobre la barra de inicio y modo avión.
 - **Proyecto real de Supabase** (`wuampfwqeqbqbbxdqzzq`, MCP ya configurado): clave publicable

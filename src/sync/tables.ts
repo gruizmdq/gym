@@ -41,7 +41,7 @@ function fromRemote(row: RemoteRow): Syncable {
   return { updatedAt: ms(row.updated_at), pending: 0 }
 }
 
-const routines: TableDefinition<RoutineVersion> = {
+export const routines: TableDefinition<RoutineVersion> = {
   local: 'routines',
   remote: 'routines',
   conflict: 'user_id,version',
@@ -61,7 +61,7 @@ const routines: TableDefinition<RoutineVersion> = {
   }),
 }
 
-const mesocycles: TableDefinition<Mesocycle> = {
+export const mesocycles: TableDefinition<Mesocycle> = {
   local: 'mesocycles',
   remote: 'mesocycles',
   conflict: 'user_id,number',
@@ -76,7 +76,7 @@ const mesocycles: TableDefinition<Mesocycle> = {
   }),
 }
 
-const sessions: TableDefinition<Session> = {
+export const sessions: TableDefinition<Session> = {
   local: 'sessions',
   remote: 'sessions',
   conflict: 'user_id,id',
@@ -126,7 +126,7 @@ const sessions: TableDefinition<Session> = {
   }),
 }
 
-const sets: TableDefinition<SetRecord> = {
+export const sets: TableDefinition<SetRecord> = {
   local: 'sets',
   remote: 'sets',
   conflict: 'user_id,id',
@@ -168,7 +168,7 @@ const sets: TableDefinition<SetRecord> = {
   }),
 }
 
-const exerciseSettings: TableDefinition<ExerciseSetting> = {
+export const exerciseSettings: TableDefinition<ExerciseSetting> = {
   local: 'exerciseSettings',
   remote: 'exercise_settings',
   conflict: 'user_id,exercise_id',
@@ -188,7 +188,7 @@ const exerciseSettings: TableDefinition<ExerciseSetting> = {
   }),
 }
 
-const weights: TableDefinition<Weight> = {
+export const weights: TableDefinition<Weight> = {
   local: 'weights',
   remote: 'weights',
   conflict: 'user_id,date',
@@ -198,7 +198,7 @@ const weights: TableDefinition<Weight> = {
   toLocal: (r) => ({ ...fromRemote(r), date: text(r.date), kg: num(r.kg) }),
 }
 
-const waists: TableDefinition<Waist> = {
+export const waists: TableDefinition<Waist> = {
   local: 'waists',
   remote: 'waists',
   conflict: 'user_id,date',
@@ -212,7 +212,7 @@ const waists: TableDefinition<Waist> = {
   }),
 }
 
-const circumferences: TableDefinition<Circumferences> = {
+export const circumferences: TableDefinition<Circumferences> = {
   local: 'circumferences',
   remote: 'circumferences',
   conflict: 'user_id,date',

@@ -7,6 +7,7 @@ import { shortDate } from '../../ui/format'
 import { Page } from '../../ui/Page'
 import { AccountSection } from '../account/SyncStatus'
 import { buildTraining } from '../training/state'
+import { DataSection } from './DataSection'
 
 const chevron = (
   <svg
@@ -119,6 +120,8 @@ export function SettingsPage() {
           </p>
         </section>
       )}
+
+      <DataSection />
 
       <AccountSection />
 

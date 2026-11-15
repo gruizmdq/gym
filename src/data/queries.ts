@@ -48,3 +48,39 @@ export function useCircumferences() {
 export function useAllSets() {
   return useLiveQuery(() => db.sets.toArray())
 }
+
+// Everything the export needs, already in memory: iOS only opens the share sheet if it's called
+// right in the tap, without waiting for IndexedDB first.
+export function useExportData() {
+  return useLiveQuery(async () => {
+    const [
+      routines,
+      mesocycles,
+      sessions,
+      sets,
+      exerciseSettings,
+      weights,
+      waists,
+      circumferences,
+    ] = await Promise.all([
+      db.routines.toArray(),
+      db.mesocycles.toArray(),
+      db.sessions.toArray(),
+      db.sets.toArray(),
+      db.exerciseSettings.toArray(),
+      db.weights.toArray(),
+      db.waists.toArray(),
+      db.circumferences.toArray(),
+    ])
+    return {
+      routines,
+      mesocycles,
+      sessions,
+      sets,
+      exerciseSettings,
+      weights,
+      waists,
+      circumferences,
+    }
+  })
+}

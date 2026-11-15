@@ -2,9 +2,25 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "gym",
   "compatibility_date": "2026-11-01",
+  // The OAuth provider fetches client metadata documents (CIMD): without this flag the fetch
+  // could reach this same zone, which opens the door to SSRF.
+  "compatibility_flags": ["global_fetch_strictly_public"],
+  // The remote MCP server (phase 7). The app's static files never go through it.
+  "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/mcp", "/mcp/*", "/authorize", "/token", "/register", "/.well-known/*"]
+  },
+  // OAuth grants, clients and tokens (hashed; props encrypted). Without an id, wrangler deploy
+  // creates the namespace the first time.
+  "kv_namespaces": [{ "binding": "OAUTH_KV" }],
+  // The same public values as .env: the Worker reads Supabase as Gonza, with RLS.
+  // For wrangler dev, .dev.vars (not committed) points them to the local Supabase.
+  "vars": {
+    "SUPABASE_URL": "https://wuampfwqeqbqbbxdqzzq.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_hOMmdvDtQlaz37NfYJ_0mA_5jnCYXcD"
   },
   // Branches other than main are published as previews (npx wrangler preview), each with
   // its own URL: useful to try a PR on the iPhone before merging it.
