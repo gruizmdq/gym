@@ -34,8 +34,7 @@ pará y preguntá.
   aviso de no equivalente ya estaban desde la fase 3.
 - **Fase 6 (rama `fase-6`, sale de `fase-5`):** Cuerpo (peso, cintura, circunferencias),
   historial de sesiones y de ejercicio con gráficos, y carga tardía. Dexie v6 y la migración
-  `20261115000000_body_and_backfill.sql` (probada en local; falta aplicarla al proyecto real
-  con `npx supabase db push --remote`).
+  `20261115000000_body_and_backfill.sql`, ya aplicada en el proyecto real (15/11/2026).
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
