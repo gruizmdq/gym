@@ -1,6 +1,14 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router'
-import { addRest, addSet, completeRow, endRest, type LogTarget, saveRow } from '../../data/actions'
+import {
+  addRest,
+  addSet,
+  completeRow,
+  endRest,
+  type LogTarget,
+  saveRow,
+  saveRows,
+} from '../../data/actions'
 import {
   useExerciseSets,
   useExerciseSettings,
@@ -8,15 +16,16 @@ import {
   useSessions,
 } from '../../data/queries'
 import { lastTime, signatureTechnique } from '../../domain/lastTime'
-import { TECHNIQUE_LABEL } from '../../domain/prescription'
-import { buildRows, completesSet, currentRow, type Row } from '../../domain/sets'
+import { TECHNIQUE_LABEL, weekOf } from '../../domain/prescription'
+import { suggestion, type Verdict } from '../../domain/progression'
+import { buildRows, completesSet, currentRow, type Row, type Side } from '../../domain/sets'
 import { routine } from '../../routine/routine'
 import { button } from '../../ui/buttons'
 import { useKeyboardHeight } from '../../ui/device'
 import { clock, formatNumber, range, setsSummary, shortDate } from '../../ui/format'
 import { Stepper } from '../../ui/Stepper'
 import { useNow } from '../../ui/useNow'
-import { nextSlot, type SessionSlot, sessionDay, sessionSlots } from '../session/model'
+import { nextSlot, type SessionSlot, sessionDay, sessionSlots, unitLabel } from '../session/model'
 import { AlternativesSheet, OptionsSheet } from './ExerciseSheets'
 
 const SIDE = { left: 'Izquierda', right: 'Derecha' } as const
@@ -47,11 +56,6 @@ function Icon({ d, size = 24 }: { d: string; size?: number }) {
   )
 }
 const CHECK = 'M20 6 9 17l-5-5'
-
-function unitLabel(s: SessionSlot): string {
-  if (s.unit === 'bricks') return 'ladrillos'
-  return s.exercise.load === 'per-dumbbell' ? `${s.unit} c/u` : s.unit
-}
 
 export function ExercisePage() {
   const { slotId } = useParams()
@@ -105,6 +109,16 @@ export function ExercisePage() {
   const previousOf = (r: Row) =>
     ref.primary?.sets.find((s) => s.number === r.number && s.side === r.side) ??
     ref.primary?.sets.filter((s) => s.side === r.side).at(-1)
+  const ups = current.sides.flatMap((side) => {
+    const v = suggestion(ref.primary, weekOf(routine, session.week), side, {
+      prescribed: current.slot.sets,
+      reps: current.reps,
+      load: current.exercise.load,
+      unit: current.unit,
+      step: current.step,
+    })
+    return v?.kind === 'up' ? [{ ...v, side }] : []
+  })
 
   const target: LogTarget = {
     sessionId: session.id,
@@ -135,6 +149,21 @@ export function ExercisePage() {
   const tapCheck = (row: Row) => {
     if (row.done) void saveRow(target, { ...row, done: false })
     else void complete(row)
+  }
+
+  // Applying is the user's tap: the side's pending sets take the new weight and the floor.
+  const applyUps = (chosen: Up[]) => {
+    const changed = chosen.flatMap((u) =>
+      rows
+        .filter((r) => r.side === u.side && !r.done)
+        .map((r) => ({
+          ...r,
+          weight: u.weights[r.number - 1] ?? u.weights.at(-1) ?? r.weight,
+          reps: u.reps,
+        })),
+    )
+    setDraft(null)
+    void saveRows(target, changed)
   }
 
   return (
@@ -181,6 +210,7 @@ export function ExercisePage() {
 
       <PrescriptionCard current={current} deloadWeek={!!session.deload} />
       <LastTimeCard references={ref} />
+      <ProgressionCard ups={ups} rows={rows} current={current} onApply={applyUps} />
 
       <section className="rounded-card bg-surface px-1.5 pt-0.5 pb-1.5" aria-label="Series">
         <div
@@ -530,6 +560,80 @@ function techniqueTag(r: { sets: { signature: string; techniqueDone: boolean }[]
   const technique = r.sets[0] ? signatureTechniqueLabel(r.sets[0].signature) : null
   if (!technique) return ' · sin técnica'
   return r.sets.some((s) => s.techniqueDone) ? ` · ${technique}` : ' · sin técnica'
+}
+
+type Up = Extract<Verdict, { kind: 'up' }> & { side: Side | null }
+const TRENDING_UP = 'm22 7-8.5 8.5-5-5L2 17M16 7h6v6'
+
+// Progression suggestion: before starting the side, it offers to go up; once applied, it says
+// it went up. If a set of that side was already done at the old weight, it doesn't show.
+function ProgressionCard({
+  ups,
+  rows,
+  current,
+  onApply,
+}: {
+  ups: Up[]
+  rows: Row[]
+  current: SessionSlot
+  onApply: (ups: Up[]) => void
+}) {
+  const shown = ups.flatMap((u) => {
+    const own = rows.filter((r) => r.side === u.side && r.number <= u.weights.length)
+    if (own.every((r) => r.weight === u.weights[r.number - 1])) return [{ up: u, applied: true }]
+    return own.some((r) => r.done) ? [] : [{ up: u, applied: false }]
+  })
+  const [a, b] = shown
+  // Both sides going up the same way read as one sentence, like in the design.
+  const groups =
+    a && b && a.applied === b.applied && a.up.weights.join() === b.up.weights.join()
+      ? [{ ups: [a.up, b.up], applied: a.applied, side: null, both: true }]
+      : shown.map((s) => ({ ups: [s.up], applied: s.applied, side: s.up.side, both: false }))
+  const unit = unitLabel(current)
+
+  return groups.map((g) => {
+    const u = g.ups[0] as Up
+    const first = u.weights[0] ?? 0
+    const amount = u.weights.every((w) => w === first)
+      ? `a ${formatNumber(first)} ${unit}`
+      : `${formatNumber(current.step)} ${unit}`
+    const side = g.side ? SIDE[g.side].toLowerCase() : null
+    const how = g.both
+      ? ', con los dos lados y con cadencia.'
+      : side
+        ? ` con la ${side}, con cadencia.`
+        : ', con cadencia.'
+    return (
+      <section
+        key={g.side ?? 'all'}
+        aria-label="Sugerencia de progresión"
+        className="flex flex-col gap-2 rounded-[14px] bg-good-soft px-3 py-2.5 text-good text-sub"
+      >
+        <p className="flex items-start gap-2.5">
+          <span className="mt-px">
+            <Icon size={18} d={TRENDING_UP} />
+          </span>
+          <span>
+            <b className="font-semibold">
+              {g.applied
+                ? `Subiste${side ? ` la ${side}` : ''} ${amount}.`
+                : `Podés subir${side ? ` la ${side}` : ''} ${amount} y volver a ${u.reps}.`}
+            </b>{' '}
+            La vez anterior cerraste {current.reps.max} en todas{how}
+          </span>
+        </p>
+        {!g.applied && (
+          <button
+            type="button"
+            onClick={() => onApply(g.ups)}
+            className="h-11 self-end rounded-xl bg-good px-5 font-semibold text-body text-white"
+          >
+            Subir
+          </button>
+        )}
+      </section>
+    )
+  })
 }
 
 function SetPanel({
