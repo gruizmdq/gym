@@ -88,6 +88,12 @@ export function sessionSlots(
 
 export const isPending = (s: SessionSlot) => !s.skipped && s.setsDone < s.sets
 
+// How the slot's unit reads on screen.
+export function unitLabel(s: SessionSlot): string {
+  if (s.unit === 'bricks') return 'ladrillos'
+  return s.exercise.load === 'per-dumbbell' ? `${s.unit} c/u` : s.unit
+}
+
 // The next exercise with sets left, starting from the one after the current one.
 export function nextSlot(slots: SessionSlot[], currentId?: string): SessionSlot | null {
   const i = slots.findIndex((s) => s.slot.id === currentId)

@@ -167,6 +167,12 @@ export async function saveRow(t: LogTarget, row: LoggedSet): Promise<void> {
   scheduleSync()
 }
 
+// Several rows at once (applying a progression suggestion to the pending sets of a side).
+export async function saveRows(t: LogTarget, rows: LoggedSet[]): Promise<void> {
+  await db.sets.bulkPut(rows.map((r) => toSetRecord(t, r)))
+  scheduleSync()
+}
+
 // Completing a row saves it and, if it closes the set (on unilaterals, with the second side),
 // starts the slot's rest.
 export async function completeRow(
