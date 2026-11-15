@@ -80,7 +80,7 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 37 | **El descanso también corre después de la última serie del ejercicio** | Es el descanso antes del ejercicio siguiente. | Cortarlo al terminar el ejercicio. | barato |
 | 38 | **Las reps de la técnica no suman al volumen** | En el drop set el peso ya no es el mismo; mejor subestimar que inventar. | Sumarlas con el peso de la serie. | barato |
 | 39 | **La técnica va en la última serie, contando las agregadas** | "Siempre en la última serie". | Fijarla en la última prescripta. | barato |
-| 40 | **Series guardadas con id determinístico (`sesión:slot:ejercicio:serie:lado`)** | Cada toque es un `put` idempotente: sin búsquedas ni duplicados, y listo para sincronizar. | Ids aleatorios. | medio |
+| 40 | **Series guardadas con id determinístico (`session:slot:exercise:number:side`)** | Cada toque es un `put` idempotente: sin búsquedas ni duplicados, y listo para sincronizar. | Ids aleatorios. | medio |
 
 ## Fase 4 (14/11/2026)
 
@@ -92,10 +92,21 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 44 | **Supabase local en Docker para probar** | La única forma de probar RLS, triggers y login de verdad antes de tocar el proyecto real. | Probar solo con dobles. | barato |
 | 45 | **URL y clave publicable en `.env` commiteado** | Son públicas por diseño; evita configurar variables en Cloudflare. | Variables de entorno en Cloudflare. | barato |
 | 46 | **Login ofrecido una vez al abrir y después desde Ajustes; sin signup en la app** | Hay un solo usuario y se crea a mano; la app sigue andando sin cuenta. | Login obligatorio. | barato |
-| 47 | **Cron semanal en Actions contra `public.latido()`** | El plan gratuito pausa el proyecto tras 7 días sin actividad. | Reactivarlo a mano desde el dashboard. | barato |
+| 47 | **Cron semanal en Actions contra `public.heartbeat()`** (antes `latido()`) | El plan gratuito pausa el proyecto tras 7 días sin actividad. | Reactivarlo a mano desde el dashboard. | barato |
+
+## Código en inglés (14/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 48 | **Todo el código en inglés: identificadores, archivos, rutas, comentarios, tests, ids del catálogo, valores de enums, claves de `routine.json`, tablas y columnas** | Pedido de Gonza: no tolera código en español. Se hizo antes de tener datos reales, así que los ids y las tablas se pudieron renombrar sin migrar nada. | Solo identificadores; o dejar la base en español con un mapeo. | caro: desde acá los ids quedan congelados |
+| 49 | **La pantalla, `CLAUDE.md` y `decisiones.md` siguen en español; los commits van en inglés** | La app es para Gonza; los docs también. | Todo en inglés. | barato |
+| 50 | **Un valor de enum nunca se muestra crudo: pasa por un mapa a su etiqueta** (`TECHNIQUE_LABEL`, unidad, cadencia `slow` → "lenta") | Los valores en inglés no pueden llegar a la pantalla. | Dejar los valores en español. | barato |
+| 51 | **Dexie arranca en la versión 4 con un solo esquema; Supabase recibe una migración que borra las tablas vacías y las crea con los nombres nuevos** | No había datos: copiar no aportaba nada. Dexie borra solo las tablas que ya no declara. La primera migración queda como historia (ya está aplicada). | Migrar filas; reescribir la primera migración (obliga a reparar el historial remoto). | barato |
 
 ## Pendiente
 - **Probar la fase 1 en el iPhone** después del primer deploy: barra de estado, splash,
   tab bar sobre la barra de inicio y modo avión.
-- **Proyecto real de Supabase** (`wuampfwqeqbqbbxdqzzq`, MCP ya configurado): clave publicable para `.env`;
-  migración aplicada con `npx supabase db push`; usuario creado y signups apagados.
+- **Proyecto real de Supabase** (`wuampfwqeqbqbbxdqzzq`, MCP ya configurado): clave publicable
+  en `.env`, primera migración aplicada y usuario creado. Falta aplicar
+  `20261114230000_english_names.sql` con `npx supabase db push --remote` y confirmar que los
+  signups estén apagados.

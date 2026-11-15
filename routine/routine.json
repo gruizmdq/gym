@@ -1,0 +1,257 @@
+{
+  "name": "Rutina bulk · dic 2026 – abr 2027 · versión 14/11/2026",
+  "exercises": [
+    { "id": "standing-calf-raise", "name": "Gemelos de pie", "equipment": "machine", "category": "isolation", "increment": 5 },
+    { "id": "leg-press-calf-raise", "name": "Gemelos en prensa", "equipment": "machine", "category": "isolation", "increment": 5 },
+    { "id": "pendulum-squat", "name": "Péndulo", "equipment": "machine", "category": "compound", "increment": 5 },
+    { "id": "leverage-squat", "name": "Sentadilla de palanca", "equipment": "machine", "category": "compound", "increment": 5 },
+    { "id": "leg-press", "name": "Prensa", "detail": "Pies en posición media", "equipment": "machine", "category": "compound", "increment": 5 },
+    { "id": "hack-squat", "name": "Hack", "detail": "Pies arriba en la plataforma", "equipment": "machine", "category": "compound", "increment": 5 },
+    { "id": "rdl", "name": "RDL", "detail": "Peso muerto rumano", "equipment": "barbell", "category": "compound", "increment": 2.5 },
+    { "id": "lying-leg-curl", "name": "Curl femoral acostado", "equipment": "machine", "category": "isolation", "increment": 2.5 },
+    { "id": "seated-leg-curl", "name": "Curl femoral sentado", "equipment": "machine", "category": "isolation", "increment": 2.5 },
+    { "id": "unilateral-leg-curl", "name": "Curl femoral unilateral", "equipment": "machine", "category": "isolation", "unilateral": true, "increment": 2.5 },
+    { "id": "leg-extension", "name": "Extensión de cuádriceps", "equipment": "machine", "category": "isolation", "increment": 2.5 },
+    { "id": "unilateral-leg-extension", "name": "Extensión de cuádriceps unilateral", "equipment": "machine", "category": "isolation", "unilateral": true, "increment": 2.5 },
+    { "id": "hammer-incline-press", "name": "Press inclinado Hammer", "equipment": "machine", "category": "compound", "increment": 5 },
+    { "id": "incline-dumbbell-press", "name": "Press inclinado con mancuernas", "equipment": "dumbbells", "category": "compound", "load": "per-dumbbell", "increment": 2 },
+    { "id": "flat-barbell-bench-press", "name": "Banca plana con barra", "equipment": "barbell", "category": "compound", "increment": 2.5 },
+    { "id": "dumbbell-shoulder-press", "name": "Press de hombro con mancuernas", "equipment": "dumbbells", "category": "compound", "load": "per-dumbbell", "increment": 2 },
+    { "id": "low-to-high-cable-fly", "name": "Fly low-to-high", "equipment": "cable", "category": "isolation", "increment": 2.5 },
+    { "id": "supinated-lat-pulldown", "name": "Jalón supino", "detail": "Agarre ancho de hombros", "equipment": "cable", "category": "compound", "increment": 2.5 },
+    { "id": "lat-pulldown", "name": "Jalón al pecho", "equipment": "cable", "category": "compound", "increment": 2.5 },
+    { "id": "v-grip-cable-row", "name": "Remo en polea con V", "equipment": "cable", "category": "compound", "increment": 2.5 },
+    { "id": "chest-supported-row", "name": "Remo con pecho apoyado", "equipment": "machine", "category": "compound", "increment": 5 },
+    { "id": "chest-supported-row-high-handles", "name": "Remo con pecho apoyado", "detail": "Manijas altas", "equipment": "machine", "category": "compound", "increment": 5 },
+    { "id": "unilateral-cable-row", "name": "Remo unilateral en polea", "equipment": "cable", "category": "compound", "unilateral": true, "increment": 2.5 },
+    { "id": "cable-pullover", "name": "Pullover en polea", "equipment": "cable", "category": "isolation", "increment": 2.5 },
+    { "id": "cable-lateral-raise", "name": "Laterales en polea", "equipment": "cable", "category": "isolation", "increment": 2.5 },
+    { "id": "unilateral-cable-lateral-raise", "name": "Laterales en polea unilateral", "detail": "Cable detrás del cuerpo", "equipment": "cable", "category": "isolation", "unilateral": true, "increment": 2.5 },
+    { "id": "machine-lateral-raise", "name": "Laterales en máquina", "equipment": "machine", "category": "isolation", "increment": 2.5 },
+    { "id": "rear-delt-pec-deck", "name": "Rear delts", "detail": "Pec deck invertido", "equipment": "machine", "category": "isolation", "increment": 2.5 },
+    { "id": "incline-dumbbell-curl", "name": "Curl inclinado con mancuernas", "equipment": "dumbbells", "category": "isolation", "load": "per-dumbbell", "increment": 2 },
+    { "id": "barbell-curl", "name": "Curl con barra", "equipment": "barbell", "category": "isolation", "increment": 2.5 },
+    { "id": "ez-bar-curl", "name": "Curl con barra Z", "equipment": "barbell", "category": "isolation", "increment": 2.5 },
+    { "id": "triceps-pushdown", "name": "Tríceps pushdown", "equipment": "cable", "category": "isolation", "increment": 2.5 },
+    { "id": "overhead-cable-triceps-extension", "name": "Tríceps overhead en polea", "equipment": "cable", "category": "isolation", "increment": 2.5 },
+    { "id": "cable-crunch", "name": "Cable crunch", "equipment": "cable", "category": "isolation", "increment": 2.5 },
+    { "id": "ab-wheel", "name": "Ab wheel", "equipment": "bodyweight", "category": "isolation", "load": "none" }
+  ],
+  "plans": [
+    {
+      "id": "5d",
+      "name": "5 días",
+      "days": [
+        {
+          "key": "lower-a",
+          "name": "Lower A",
+          "focus": "Cuádriceps",
+          "slots": [
+            { "id": "calves", "exercise": "standing-calf-raise", "sets": 4, "reps": { "min": 8, "max": 12 }, "rest": 90, "tempo": "2-2-1-1", "pause": "Talón abajo al máximo, gemelo estirado (y apretón arriba)", "technique": "lengthened-partials" },
+            {
+              "id": "main",
+              "exercise": "pendulum-squat",
+              "rotationByMesocycle": ["pendulum-squat", "leverage-squat"],
+              "sets": 4,
+              "reps": { "min": 6, "max": 10 },
+              "rest": 180,
+              "tempo": "2-1-1-0",
+              "pause": "Abajo, en la profundidad máxima sin dolor de rodilla",
+              "alternatives": ["leg-press"],
+              "note": "Principal. Si duele la rodilla, pasá a la prensa."
+            },
+            { "id": "leg-press", "exercise": "leg-press", "sets": 3, "reps": { "min": 10, "max": 12 }, "rest": 120, "tempo": "2-0-1-0", "technique": "rest-pause", "alternatives": ["hack-squat"] },
+            { "id": "leg-curl", "exercise": "lying-leg-curl", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 90, "tempo": "2-0-1-0" },
+            { "id": "leg-extension", "exercise": "leg-extension", "sets": 3, "reps": { "min": 12, "max": 15 }, "rest": 75, "tempo": "2-1-1-0", "pause": "Abajo, rodilla bien flexionada", "technique": "drop-set", "note": "Rango completo abajo, sin patear arriba. Si molesta la rodilla, bajá el peso." },
+            { "id": "triceps", "exercise": "triceps-pushdown", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 75, "tempo": "2-0-1-0" },
+            { "id": "crunch", "exercise": "cable-crunch", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 60, "tempo": "2-0-1-1", "note": "Carga progresiva." }
+          ]
+        },
+        {
+          "key": "upper-a",
+          "name": "Upper A",
+          "focus": "Pecho superior + dorsal",
+          "notices": [{ "weeks": [5], "text": "Test de banca: hacé la banca primero y pesada." }],
+          "slots": [
+            { "id": "hammer-press", "exercise": "hammer-incline-press", "sets": 4, "reps": { "min": 6, "max": 10 }, "rest": 180, "tempo": "2-1-1-0", "pause": "Manerales a la altura del pecho, pecho abierto", "note": "Press principal." },
+            { "id": "pulldown", "exercise": "supinated-lat-pulldown", "sets": 4, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-1-1-0", "pause": "Arriba, brazos casi extendidos, hombros hacia las orejas" },
+            { "id": "bench", "exercise": "flat-barbell-bench-press", "sets": 3, "reps": { "min": 6, "max": 10 }, "rest": 150, "tempo": "2-0-1-0" },
+            { "id": "row", "exercise": "v-grip-cable-row", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-1-1-0", "pause": "Adelante, brazos extendidos, hombros protraídos", "alternatives": ["chest-supported-row"], "note": "Codos a la cadera." },
+            { "id": "lateral-raise", "exercise": "cable-lateral-raise", "sets": 4, "reps": { "min": 12, "max": 20 }, "rest": 75, "tempo": "2-0-1-0", "technique": "drop-set" },
+            { "id": "rear-delts", "exercise": "rear-delt-pec-deck", "sets": 3, "reps": { "min": 15, "max": 20 }, "rest": 60, "tempo": "2-0-1-1" },
+            { "id": "curl", "exercise": "incline-dumbbell-curl", "sets": 3, "reps": { "min": 10, "max": 12 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Abajo, brazo extendido detrás del cuerpo" }
+          ]
+        },
+        {
+          "key": "lower-b",
+          "name": "Lower B",
+          "focus": "Cadena posterior",
+          "slots": [
+            { "id": "calves", "exercise": "leg-press-calf-raise", "sets": 4, "reps": { "min": 10, "max": 15 }, "rest": 90, "tempo": "2-2-1-1", "pause": "Tobillo flexionado al máximo hacia vos, pantorrilla estirada (y apretón al empujar)", "note": "Rodilla extendida." },
+            { "id": "rdl", "exercise": "rdl", "sets": 3, "reps": { "min": 6, "max": 10 }, "rest": 180, "tempo": "2-1-1-0", "pause": "Barra bajo las rodillas, isquios estirados, espalda neutra", "note": "Straps si hace falta." },
+            { "id": "leg-press", "exercise": "leg-press", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 120, "tempo": "2-0-1-0", "alternatives": ["hack-squat"], "note": "Sin técnicas: viene después del RDL." },
+            { "id": "leg-curl", "exercise": "seated-leg-curl", "sets": 4, "reps": { "min": 10, "max": 12 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Adelante, pierna casi extendida", "technique": "rest-pause" },
+            { "id": "leg-extension", "exercise": "leg-extension", "sets": 2, "reps": { "min": 15, "max": 20 }, "rest": 60, "tempo": "2-0-1-0" },
+            { "id": "triceps", "exercise": "overhead-cable-triceps-extension", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Codo flexionado detrás de la cabeza" },
+            { "id": "ab-wheel", "exercise": "ab-wheel", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 60, "tempo": "slow" }
+          ]
+        },
+        {
+          "key": "upper-b",
+          "name": "Upper B",
+          "focus": "V-taper",
+          "slots": [
+            { "id": "pulldown", "exercise": "lat-pulldown", "sets": 4, "reps": { "min": 6, "max": 10 }, "rest": 180, "tempo": "2-0-1-0", "note": "Tirón primero." },
+            { "id": "shoulder-press", "exercise": "dumbbell-shoulder-press", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-0-1-0" },
+            { "id": "row", "exercise": "chest-supported-row-high-handles", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-0-1-1", "note": "Espalda alta, codos abiertos." },
+            { "id": "incline-press", "exercise": "incline-dumbbell-press", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-1-1-0", "pause": "Mancuernas a la altura del pecho, pecho abierto" },
+            { "id": "lateral-raise", "exercise": "machine-lateral-raise", "sets": 4, "reps": { "min": 12, "max": 20 }, "rest": 75, "tempo": "2-0-1-0", "technique": "lengthened-partials" },
+            { "id": "fly", "exercise": "low-to-high-cable-fly", "sets": 2, "reps": { "min": 12, "max": 15 }, "rest": 60, "tempo": "2-0-1-1" },
+            { "id": "curl", "exercise": "barbell-curl", "sets": 3, "reps": { "min": 8, "max": 10 }, "rest": 90, "tempo": "2-0-1-0", "alternatives": ["ez-bar-curl"], "note": "Barra Z si molesta el codo." }
+          ]
+        },
+        {
+          "key": "day-5",
+          "name": "Día 5",
+          "focus": "Dorsal + piernas complemento",
+          "skippable": true,
+          "slots": [
+            { "id": "pullover", "exercise": "cable-pullover", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Arriba, brazos por encima de la cabeza, dorsal alargado", "note": "Dorsal aislado." },
+            { "id": "row", "exercise": "unilateral-cable-row", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Brazo extendido hacia la polea, costado de la espalda estirado", "firstSide": "left", "note": "Codo a la cadera." },
+            { "id": "lateral-raise", "exercise": "unilateral-cable-lateral-raise", "sets": 3, "reps": { "min": 12, "max": 20 }, "rest": 60, "tempo": "2-1-1-0", "pause": "Abajo, brazo cruzado detrás del cuerpo, hombro estirado", "technique": "drop-set", "firstSide": "left" },
+            {
+              "id": "leg-extension",
+              "exercise": "unilateral-leg-extension",
+              "sets": 3,
+              "reps": { "min": 12, "max": 15 },
+              "rest": 60,
+              "tempo": "2-1-1-0",
+              "pause": "Abajo, rodilla bien flexionada",
+              "firstSide": "left",
+              "note": "Empezá con la izquierda, el lado débil. Con la derecha igualás las reps, sin hacer más."
+            },
+            {
+              "id": "leg-curl",
+              "exercise": "unilateral-leg-curl",
+              "sets": 3,
+              "reps": { "min": 10, "max": 15 },
+              "rest": 60,
+              "tempo": "2-1-1-0",
+              "pause": "Pierna extendida abajo, isquio estirado",
+              "firstSide": "right",
+              "note": "Empezá con la derecha, el lado débil. Con la izquierda igualás las reps, sin hacer más."
+            },
+            { "id": "calves", "exercise": "standing-calf-raise", "sets": 4, "reps": { "min": 10, "max": 12 }, "rest": 75, "tempo": "2-2-1-1", "pause": "Talón abajo al máximo, gemelo estirado (y apretón arriba)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4d",
+      "name": "4 días",
+      "days": [
+        {
+          "key": "lower-a",
+          "name": "Lower A",
+          "focus": "Cuádriceps",
+          "slots": [
+            { "id": "calves", "exercise": "standing-calf-raise", "sets": 4, "reps": { "min": 8, "max": 12 }, "rest": 90, "tempo": "2-2-1-1", "pause": "Talón abajo al máximo, gemelo estirado (y apretón arriba)", "technique": "lengthened-partials" },
+            {
+              "id": "main",
+              "exercise": "pendulum-squat",
+              "rotationByMesocycle": ["pendulum-squat", "leverage-squat"],
+              "sets": 4,
+              "reps": { "min": 6, "max": 10 },
+              "rest": 180,
+              "tempo": "2-1-1-0",
+              "pause": "Abajo, en la profundidad máxima sin dolor de rodilla",
+              "alternatives": ["leg-press"],
+              "note": "Principal. Si duele la rodilla, pasá a la prensa."
+            },
+            { "id": "leg-press", "exercise": "leg-press", "sets": 3, "reps": { "min": 10, "max": 12 }, "rest": 120, "tempo": "2-0-1-0", "technique": "rest-pause", "alternatives": ["hack-squat"] },
+            { "id": "leg-curl", "exercise": "lying-leg-curl", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 90, "tempo": "2-0-1-0" },
+            {
+              "id": "leg-extension",
+              "exercise": "unilateral-leg-extension",
+              "sets": 3,
+              "reps": { "min": 12, "max": 15 },
+              "rest": 75,
+              "tempo": "2-1-1-0",
+              "pause": "Abajo, rodilla bien flexionada",
+              "technique": "drop-set",
+              "firstSide": "left",
+              "note": "Empezá con la izquierda, el lado débil. Con la derecha igualás las reps, sin hacer más."
+            },
+            { "id": "triceps", "exercise": "triceps-pushdown", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 75, "tempo": "2-0-1-0" },
+            { "id": "crunch", "exercise": "cable-crunch", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 60, "tempo": "2-0-1-1", "note": "Carga progresiva." }
+          ]
+        },
+        {
+          "key": "upper-a",
+          "name": "Upper A",
+          "focus": "Pecho superior + dorsal",
+          "notices": [{ "weeks": [5], "text": "Test de banca: hacé la banca primero y pesada." }],
+          "slots": [
+            { "id": "hammer-press", "exercise": "hammer-incline-press", "sets": 4, "reps": { "min": 6, "max": 10 }, "rest": 180, "tempo": "2-1-1-0", "pause": "Manerales a la altura del pecho, pecho abierto", "note": "Press principal." },
+            { "id": "pulldown", "exercise": "supinated-lat-pulldown", "sets": 4, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-1-1-0", "pause": "Arriba, brazos casi extendidos, hombros hacia las orejas" },
+            { "id": "bench", "exercise": "flat-barbell-bench-press", "sets": 3, "reps": { "min": 6, "max": 10 }, "rest": 150, "tempo": "2-0-1-0" },
+            { "id": "row", "exercise": "v-grip-cable-row", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-1-1-0", "pause": "Adelante, brazos extendidos, hombros protraídos", "alternatives": ["chest-supported-row"], "note": "Codos a la cadera." },
+            { "id": "lateral-raise", "exercise": "cable-lateral-raise", "sets": 4, "reps": { "min": 12, "max": 20 }, "rest": 75, "tempo": "2-0-1-0", "technique": "drop-set" },
+            { "id": "rear-delts", "exercise": "rear-delt-pec-deck", "sets": 3, "reps": { "min": 15, "max": 20 }, "rest": 60, "tempo": "2-0-1-1" },
+            { "id": "curl", "exercise": "incline-dumbbell-curl", "sets": 3, "reps": { "min": 10, "max": 12 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Abajo, brazo extendido detrás del cuerpo" }
+          ]
+        },
+        {
+          "key": "lower-b",
+          "name": "Lower B",
+          "focus": "Cadena posterior",
+          "slots": [
+            { "id": "calves", "exercise": "leg-press-calf-raise", "sets": 4, "reps": { "min": 10, "max": 15 }, "rest": 90, "tempo": "2-2-1-1", "pause": "Tobillo flexionado al máximo hacia vos, pantorrilla estirada (y apretón al empujar)", "note": "Rodilla extendida." },
+            { "id": "rdl", "exercise": "rdl", "sets": 3, "reps": { "min": 6, "max": 10 }, "rest": 180, "tempo": "2-1-1-0", "pause": "Barra bajo las rodillas, isquios estirados, espalda neutra", "note": "Straps si hace falta." },
+            { "id": "leg-press", "exercise": "leg-press", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 120, "tempo": "2-0-1-0", "alternatives": ["hack-squat"], "note": "Sin técnicas: viene después del RDL." },
+            { "id": "leg-curl", "exercise": "seated-leg-curl", "sets": 3, "reps": { "min": 10, "max": 12 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Adelante, pierna casi extendida", "technique": "rest-pause" },
+            {
+              "id": "unilateral-leg-curl",
+              "exercise": "unilateral-leg-curl",
+              "sets": 2,
+              "reps": { "min": 10, "max": 15 },
+              "rest": 60,
+              "tempo": "2-1-1-0",
+              "pause": "Pierna extendida abajo, isquio estirado",
+              "firstSide": "right",
+              "note": "Empezá con la derecha, el lado débil. Con la izquierda igualás las reps, sin hacer más."
+            },
+            { "id": "leg-extension", "exercise": "leg-extension", "sets": 2, "reps": { "min": 15, "max": 20 }, "rest": 60, "tempo": "2-0-1-0" },
+            { "id": "triceps", "exercise": "overhead-cable-triceps-extension", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Codo flexionado detrás de la cabeza" },
+            { "id": "ab-wheel", "exercise": "ab-wheel", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 60, "tempo": "slow" }
+          ]
+        },
+        {
+          "key": "upper-b",
+          "name": "Upper B",
+          "focus": "V-taper",
+          "slots": [
+            { "id": "pulldown", "exercise": "lat-pulldown", "sets": 4, "reps": { "min": 6, "max": 10 }, "rest": 180, "tempo": "2-0-1-0", "note": "Tirón primero." },
+            { "id": "pullover", "exercise": "cable-pullover", "sets": 3, "reps": { "min": 10, "max": 15 }, "rest": 90, "tempo": "2-1-1-0", "pause": "Arriba, brazos por encima de la cabeza, dorsal alargado", "note": "Dorsal aislado." },
+            { "id": "shoulder-press", "exercise": "dumbbell-shoulder-press", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-0-1-0" },
+            { "id": "row", "exercise": "chest-supported-row-high-handles", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-0-1-1", "note": "Espalda alta, codos abiertos." },
+            { "id": "incline-press", "exercise": "incline-dumbbell-press", "sets": 3, "reps": { "min": 8, "max": 12 }, "rest": 120, "tempo": "2-1-1-0", "pause": "Mancuernas a la altura del pecho, pecho abierto" },
+            { "id": "lateral-raise", "exercise": "machine-lateral-raise", "sets": 4, "reps": { "min": 12, "max": 20 }, "rest": 75, "tempo": "2-0-1-0", "technique": "lengthened-partials" },
+            { "id": "curl", "exercise": "barbell-curl", "sets": 3, "reps": { "min": 8, "max": 10 }, "rest": 90, "tempo": "2-0-1-0", "alternatives": ["ez-bar-curl"], "note": "Barra Z si molesta el codo." },
+            { "id": "calves", "exercise": "standing-calf-raise", "sets": 3, "reps": { "min": 10, "max": 12 }, "rest": 60, "tempo": "2-2-1-1", "pause": "Talón abajo al máximo, gemelo estirado (y apretón arriba)" }
+          ]
+        }
+      ]
+    }
+  ],
+  "mesocycle": {
+    "weeks": [
+      { "week": 1, "name": "Calibración", "rir": { "compound": { "min": 2, "max": 3 }, "isolation": { "min": 2, "max": 3 } }, "techniquesFromMesocycle": null },
+      { "week": 2, "rir": { "compound": { "min": 1, "max": 2 }, "isolation": { "min": 0, "max": 1 } }, "techniquesFromMesocycle": 2 },
+      { "week": 3, "rir": { "compound": { "min": 1, "max": 2 }, "isolation": { "min": 0, "max": 1 } }, "techniquesFromMesocycle": 1 },
+      { "week": 4, "rir": { "compound": { "min": 1, "max": 1 }, "isolation": { "min": 0, "max": 0 } }, "techniquesFromMesocycle": 1, "note": "Si recuperás bien, podés sumar 1 serie de laterales y 1 de dorsal." },
+      { "week": 5, "rir": { "compound": { "min": 1, "max": 1 }, "isolation": { "min": 0, "max": 0 } }, "techniquesFromMesocycle": 1, "note": "Si recuperás bien, podés sumar 1 serie de laterales y 1 de dorsal." },
+      { "week": 6, "name": "Descarga", "deload": true, "techniquesFromMesocycle": null }
+    ]
+  }
+}

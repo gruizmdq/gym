@@ -1,12 +1,12 @@
 import { createBrowserRouter } from 'react-router'
-import { AjustesPage } from '../features/ajustes/AjustesPage'
-import { EntrarPage } from '../features/cuenta/EntrarPage'
-import { CuerpoPage } from '../features/cuerpo/CuerpoPage'
-import { EjercicioPage } from '../features/ejercicio/EjercicioPage'
-import { HistorialPage } from '../features/historial/HistorialPage'
-import { HoyPage } from '../features/hoy/HoyPage'
-import { ResumenPage } from '../features/resumen/ResumenPage'
-import { SesionLayout, SesionPage } from '../features/sesion/SesionPage'
+import { SignInPage } from '../features/account/SignInPage'
+import { BodyPage } from '../features/body/BodyPage'
+import { ExercisePage } from '../features/exercise/ExercisePage'
+import { HistoryPage } from '../features/history/HistoryPage'
+import { SessionLayout, SessionPage } from '../features/session/SessionPage'
+import { SettingsPage } from '../features/settings/SettingsPage'
+import { SummaryPage } from '../features/summary/SummaryPage'
+import { TodayPage } from '../features/today/TodayPage'
 import { AppShell } from './AppShell'
 
 export const router = createBrowserRouter([
@@ -14,21 +14,21 @@ export const router = createBrowserRouter([
     path: '/',
     Component: AppShell,
     children: [
-      { index: true, Component: HoyPage },
-      { path: 'historial', Component: HistorialPage },
-      { path: 'cuerpo', Component: CuerpoPage },
-      { path: 'ajustes', Component: AjustesPage },
+      { index: true, Component: TodayPage },
+      { path: 'history', Component: HistoryPage },
+      { path: 'body', Component: BodyPage },
+      { path: 'settings', Component: SettingsPage },
     ],
   },
-  // La sesión activa es pantalla completa: sin tab bar y con la pantalla siempre prendida.
+  // The active session is full screen: no tab bar and the screen always on.
   {
-    path: '/sesion',
-    Component: SesionLayout,
+    path: '/session',
+    Component: SessionLayout,
     children: [
-      { index: true, Component: SesionPage },
-      { path: 'ejercicio/:slotId', Component: EjercicioPage },
+      { index: true, Component: SessionPage },
+      { path: 'exercise/:slotId', Component: ExercisePage },
     ],
   },
-  { path: '/resumen/:id', Component: ResumenPage },
-  { path: '/entrar', Component: EntrarPage },
+  { path: '/summary/:id', Component: SummaryPage },
+  { path: '/sign-in', Component: SignInPage },
 ])

@@ -1,12 +1,12 @@
-/** Commit corto del build; se muestra en Ajustes. Lo define vite.config.ts. */
+/** Short commit of the build; shown in Settings. Defined by vite.config.ts. */
 declare const __BUILD__: string
 
-/** Hash del contenido de rutina/rutina.json. Lo define vite.config.ts. */
-declare const __VERSION_RUTINA__: string
+/** Hash of the contents of routine/routine.json. Defined by vite.config.ts. */
+declare const __ROUTINE_VERSION__: string
 
 interface ImportMetaEnv {
-  /** URL del proyecto de Supabase. Sin ella la app funciona igual, pero no sincroniza. */
+  /** Supabase project URL. Without it the app works the same, but doesn't sync. */
   readonly VITE_SUPABASE_URL?: string
-  /** Clave publicable (pública por diseño: va dentro de la app). Nunca la secret. */
+  /** Publishable key (public by design: it ships inside the app). Never the secret. */
   readonly VITE_SUPABASE_PUBLISHABLE_KEY?: string
 }

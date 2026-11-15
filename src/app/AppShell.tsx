@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router'
-import { CLAVE_OFRECIDO, marcarOfrecido } from '../features/cuenta/EntrarPage'
-import { supabase } from '../sync/cliente'
-import { useCuenta } from '../sync/estado'
+import { markSignInOffered, SIGN_IN_OFFERED_KEY } from '../features/account/SignInPage'
+import { supabase } from '../sync/client'
+import { useAccount } from '../sync/status'
 import { TabBar } from '../ui/TabBar'
 
-function yaOfrecido(): boolean {
+function alreadyOffered(): boolean {
   try {
-    return localStorage.getItem(CLAVE_OFRECIDO) === '1'
+    return localStorage.getItem(SIGN_IN_OFFERED_KEY) === '1'
   } catch {
     return true
   }
@@ -15,14 +15,14 @@ function yaOfrecido(): boolean {
 
 export function AppShell() {
   const navigate = useNavigate()
-  const { cargando, email } = useCuenta()
+  const { loading, email } = useAccount()
 
-  // El login se ofrece una sola vez; después queda en Ajustes.
+  // Sign-in is offered only once; after that it lives in Settings.
   useEffect(() => {
-    if (!supabase || cargando || email || yaOfrecido()) return
-    marcarOfrecido()
-    navigate('/entrar')
-  }, [cargando, email, navigate])
+    if (!supabase || loading || email || alreadyOffered()) return
+    markSignInOffered()
+    navigate('/sign-in')
+  }, [loading, email, navigate])
 
   return (
     <div className="flex h-dvh flex-col">

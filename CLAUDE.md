@@ -2,7 +2,7 @@
 
 App web para registrar entrenamientos de gimnasio. Un solo usuario (Gonza), instalada
 como PWA en un iPhone 17 ("Agregar a inicio"). Reemplaza a Hevy. Offline first.
-Interfaz en español rioplatense, unidades en kg.
+Interfaz en español rioplatense, unidades en kg. **El código va en inglés** (ver Idioma).
 
 La rutina vigente está en `Rutina_bulk_Gonza_v2.pdf` (versión 14/11/2026). El porqué de
 cada decisión está en `docs/decisiones.md`: este archivo dice **qué** se hace.
@@ -25,8 +25,10 @@ pará y preguntá.
   terminar con pendientes y resumen.
 - **Fase 4 (rama `fase-4`, sale de `fase-3`):** Supabase (migración con RLS, cursor por
   secuencia y última escritura gana), Dexie v3 con marca de pendiente, motor de sync, login
-  persistente, estado en Hoy y Ajustes, latido semanal. Probado contra Supabase local. Falta el
-  proyecto real: aplicar la migración con `npx supabase db push --remote`.
+  persistente, estado en Hoy y Ajustes, latido semanal. Probado contra Supabase local.
+- **Código en inglés (rama `english-codebase`):** identificadores, archivos, ids, tablas de
+  Dexie y de Supabase. La migración `20261114230000_english_names.sql` reemplaza las tablas
+  vacías de la primera: falta aplicarla al proyecto real con `npx supabase db push --remote`.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -79,26 +81,26 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - `.env` (commiteado) tiene la URL y la clave **publicable** del proyecto real: son públicas,
   igual van dentro de la app. La `secret`/`service_role` nunca entra al repo ni a la app.
 - Columnas en snake_case con los mismos nombres que la app. Cada tabla: `user_id` con RLS,
-  `actualizado_en` (hora del teléfono: gana la más nueva; el trigger ignora una más vieja),
-  `eliminado_en` (borrado lógico, sin `delete`) y `secuencia` (cursor del pull).
+  `updated_at` (hora del teléfono: gana la más nueva; el trigger ignora una más vieja),
+  `deleted_at` (borrado lógico, sin `delete`) y `seq` (cursor del pull).
 - **Para analizar los datos:** el MCP `supabase` de `.mcp.json` (proyecto
   `wuampfwqeqbqbbxdqzzq`, `read_only=true`) deja consultar con SQL. Se autentica una vez con
   `/mcp` en Claude Code. Para escribir esquema se usan migraciones, nunca el MCP.
-- `public.latido()` existe solo para el cron semanal (`.github/workflows/latido.yml`) que
-  evita la pausa del plan gratuito.
+- `public.heartbeat()` existe solo para el cron semanal (`.github/workflows/heartbeat.yml`)
+  que evita la pausa del plan gratuito.
 
 ## Estructura
 ```
-rutina/rutina.json   la rutina (dato); la valida src/rutina/schema.test.ts
-src/dominio/         reglas puras con tests: fechas, mesociclo, rotación, prescripción
-src/datos/           Dexie: db.ts (tablas), acciones.ts (toda escritura), consultas.ts (lecturas vivas)
-src/features/<x>/    pantallas; entrenamiento/estado.ts junta dominio + datos para Hoy, sesión y Ajustes
-src/ui/              piezas sin dominio: Pagina, Hoja (<dialog>), TabBar, formato, botones
+routine/routine.json la rutina (dato); la valida src/routine/schema.test.ts
+src/domain/          reglas puras con tests: fechas, mesociclo, rotación, prescripción, series, vez anterior
+src/data/            Dexie: db.ts (tablas), actions.ts (toda escritura), queries.ts (lecturas vivas)
+src/features/<x>/    pantallas; training/state.ts junta dominio + datos para Hoy, sesión y Ajustes
+src/ui/              piezas sin dominio: Page, Sheet (<dialog>), TabBar, format, buttons
 src/pwa/             service worker (se registra desde main.tsx, fuera del router) y almacenamiento
-src/sync/            el único que habla con Supabase: tablas.ts (mapeo), motor.ts (subir, bajar,
-                     resolver), iniciar.ts (cuándo corre, login), estado.ts (lo que ve la UI)
-src/features/sesion/modelo.ts   cada slot de la sesión en curso: ejercicio elegido, unidad, firma, progreso
-src/features/ejercicio/         la pantalla central: filas, panel inferior y hojas de opciones
+src/sync/            el único que habla con Supabase: tables.ts (mapeo), engine.ts (subir, bajar,
+                     resolver), start.ts (cuándo corre, login), status.ts (lo que ve la UI)
+src/features/session/model.ts   cada slot de la sesión en curso: ejercicio elegido, unidad, firma, progreso
+src/features/exercise/          la pantalla central: filas, panel inferior y hojas de opciones
 ```
 - Para probar en el navegador sin ensuciar la rotación, descartá la sesión en vez de
   terminarla. Antes del 7/12, terminar una sesión corre el inicio del mesociclo 1 a ese
@@ -120,11 +122,11 @@ src/features/ejercicio/         la pantalla central: filas, panel inferior y hoj
   signups quedan deshabilitados después de crear el usuario. RLS restringe cada tabla a
   `user_id = (select auth.uid())`. La app funciona sin sesión: la sesión solo la usa el
   sync.
-- **Rutina:** `rutina/rutina.json`, con la forma de `src/rutina/schema.ts` (Zod). El test
-  `src/rutina/schema.test.ts` la valida: si no valida, no hay deploy. Para editarla:
+- **Rutina:** `routine/routine.json`, con la forma de `src/routine/schema.ts` (Zod). El test
+  `src/routine/schema.test.ts` la valida: si no valida, no hay deploy. Para editarla:
   cambiá el JSON y corré `npm run test`; el error dice qué día, slot y campo fallan.
   La versión es el hash del contenido. Al abrir, la app guarda la versión en
-  `routine_versions` (local y Supabase); cada sesión guarda con qué versión se hizo.
+  `routines` (local y Supabase); cada sesión guarda con qué versión se hizo.
   Cada plan lista sus días completos, **sin herencia**. Los días tienen una clave
   compartida entre planes (`lower-a`). Los avisos por semana (test de banca) son datos
   del día, no código.
@@ -166,7 +168,7 @@ src/features/ejercicio/         la pantalla central: filas, panel inferior y hoj
     ("Jue · Lower B · sin técnica").
   - Las sesiones de descarga no son referencia principal ni cuentan para progresión.
 - **Progresión (doble):** si en la referencia principal todas las series llegaron al techo
-  del rango con `cadenceOk`, se sugiere subir el incremento mínimo del ejercicio y volver al
+  del rango con `tempoOk`, se sugiere subir el incremento mínimo del ejercicio y volver al
   piso. En unilaterales, por lado. Las reps extra de la técnica no cuentan. **Es una
   sugerencia, nunca un cambio automático.**
 - **Alerta de retroceso:** si un compuesto retrocede dos sesiones seguidas, se avisa:
@@ -218,15 +220,15 @@ src/features/ejercicio/         la pantalla central: filas, panel inferior y hoj
   Con `black-translucent` el texto de la hora queda blanco sobre fondo claro.
 - **El panel de la serie edita un borrador local** y lo guarda en segundo plano. Si se lee
   el valor de la base en cada toque, varios "+" seguidos se pisan (ya pasó).
-- **Toda escritura de `acciones.ts` lleva `marca()`** (`actualizadoEn` + `pendiente: 1`) y
-  llama a `programarSync()`. Una escritura sin marca nunca se sube. El sync escribe sin
+- **Toda escritura de `actions.ts` lleva `stamp()`** (`updatedAt` + `pending: 1`) y
+  llama a `scheduleSync()`. Una escritura sin marca nunca se sube. El sync escribe sin
   marca, a propósito (lo que baja ya está al día).
 - **Nada de llamadas a Supabase dentro de `onAuthStateChange`**: puede trabar el cliente. Se
   difieren con `setTimeout`.
 - **El service worker se registra desde la raíz** (`main.tsx`). Si vive en una pantalla, la
   app abierta directo en la sesión no queda disponible sin conexión (ya pasó).
-- **Los títulos no saltan entre pestañas:** `Pagina` reserva siempre la línea del
-  antetítulo, aunque esté vacía.
+- **Los títulos no saltan entre pestañas:** `Page` reserva siempre la línea del
+  antetítulo (`eyebrow`), aunque esté vacía.
 - **Wake Lock se libera al ocultarse la app:** volver a pedirlo en `visibilitychange`.
 - **Supabase gratis pausa el proyecto tras 7 días sin actividad.** Se reactiva desde el
   dashboard; la app sigue andando sin conexión.
@@ -246,6 +248,15 @@ src/features/ejercicio/         la pantalla central: filas, panel inferior y hoj
   - Voseo. Si salió bien, decí qué pasó; si falló, hacete cargo y decí qué hacer.
   - Sin emojis y sin "exitosamente".
   - Nada técnico en pantalla.
+
+## Idioma
+- **Código en inglés:** identificadores, archivos, carpetas, rutas, comentarios, títulos de
+  tests, ids del catálogo, valores de enums, claves de `routine.json` y nombres de tablas y
+  columnas.
+- **Pantalla en español:** todo lo que se ve (textos, `aria-label`, nombres de ejercicios en
+  `routine.json`). Un valor de enum que se muestra pasa por un mapa a su etiqueta en español
+  (`TECHNIQUE_LABEL`, unidad, cadencia `slow`); nunca se muestra el valor crudo.
+- **Docs en español** (`CLAUDE.md`, `docs/decisiones.md`). **Commits en inglés.**
 
 ## Tests
 - **Toda lógica de dominio lleva tests.** Antes de implementar una regla con casos

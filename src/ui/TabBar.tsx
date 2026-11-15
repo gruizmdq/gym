@@ -1,12 +1,12 @@
 import type { ComponentType, SVGProps } from 'react'
 import { NavLink } from 'react-router'
-import { IconoAjustes, IconoCuerpo, IconoHistorial, IconoHoy } from './iconos'
+import { BodyIcon, HistoryIcon, SettingsIcon, TodayIcon } from './icons'
 
-const secciones: { to: string; label: string; Icono: ComponentType<SVGProps<SVGSVGElement>> }[] = [
-  { to: '/', label: 'Hoy', Icono: IconoHoy },
-  { to: '/historial', label: 'Historial', Icono: IconoHistorial },
-  { to: '/cuerpo', label: 'Cuerpo', Icono: IconoCuerpo },
-  { to: '/ajustes', label: 'Ajustes', Icono: IconoAjustes },
+const sections: { to: string; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+  { to: '/', label: 'Hoy', Icon: TodayIcon },
+  { to: '/history', label: 'Historial', Icon: HistoryIcon },
+  { to: '/body', label: 'Cuerpo', Icon: BodyIcon },
+  { to: '/settings', label: 'Ajustes', Icon: SettingsIcon },
 ]
 
 export function TabBar() {
@@ -15,7 +15,7 @@ export function TabBar() {
       aria-label="Secciones"
       className="fixed inset-x-4 bottom-[max(12px,calc(env(safe-area-inset-bottom)-10px))] z-30 grid h-16 grid-cols-4 rounded-full bg-surface/85 p-1 shadow-float backdrop-blur-xl backdrop-saturate-150"
     >
-      {secciones.map(({ to, label, Icono }) => (
+      {sections.map(({ to, label, Icon }) => (
         <NavLink
           key={to}
           to={to}
@@ -26,7 +26,7 @@ export function TabBar() {
             }`
           }
         >
-          <Icono />
+          <Icon />
           {label}
         </NavLink>
       ))}

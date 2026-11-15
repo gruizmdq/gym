@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Tokens de la hoja "Sistema visual" de los lienzos. Se borra la paleta de Tailwind para que
-   solo existan estos colores: nada de hex sueltos ni colores fuera del diseño. */
+/* Tokens from the "Sistema visual" sheet in the canvases. Tailwind's palette is cleared so that
+   only these colors exist: no stray hex values and no colors outside the design. */
 @theme {
   --color-*: initial;
   --color-white: #ffffff;
@@ -60,7 +60,7 @@
     background: var(--color-bg);
   }
 
-  /* Sin rubber band ni pull-to-refresh del navegador: solo se desplaza el contenido. */
+  /* No browser rubber band or pull-to-refresh: only the content scrolls. */
   html,
   body {
     height: 100%;
@@ -78,8 +78,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Los controles no seleccionan texto, no hacen zoom con doble toque ni abren la vista previa
-     de links al mantenerlos apretados. */
+  /* Controls don't select text, don't zoom on double tap and don't open the link preview
+     when long-pressed. */
   button,
   a,
   [role="button"] {
@@ -89,7 +89,7 @@
     -webkit-touch-callout: none;
   }
 
-  /* Por debajo de 16 px, iOS hace zoom al enfocar el campo. */
+  /* Below 16 px, iOS zooms in when the field gets focus. */
   input,
   textarea,
   select {
