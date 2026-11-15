@@ -141,6 +141,14 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 73 | **`verify` también empaqueta el Worker (`wrangler deploy --dry-run`)** | Un error de bundle del MCP aparece en el PR y no recién en el deploy. | Dejarlo para Workers Builds. | barato |
 | 74 | **El MCP de Supabase queda con escritura (antes `read_only=true`)** | Decisión de Gonza, después de cargar el historial de peso: cargas y correcciones de datos sin pasar por la CLI. El esquema sigue yendo solo por migraciones. | Solo lectura, habilitando la escritura un rato cuando hace falta (lo recomendado). | barato |
 
+## Mac (15/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 75 | **En pantallas anchas la app es una columna de 402 px centrada** (`--container-app`) | Decisión de Gonza: la app tal cual el iPhone, como una app de iPhone en la Mac. 402 px es el ancho del iPhone 17 y de los lienzos: los gráficos, dibujados a 338 px, quedan 1:1. Lo fijo (tab bar, panel inferior, botón de Hoy, aviso de versión) se acota a la columna. | Barra lateral y columna de 720 px: diseño que no está en los lienzos. Columna ancha con la tab bar abajo: gráficos a redibujar. Columna de ~480 px (lo que se propuso primero): los gráficos se agrandan con el texto. | barato: es el token |
+| 76 | **Desde `sm` las hojas son un modal centrado; se cierran con Esc o con un clic afuera** | Decisión de Gonza: es lo esperable con mouse. Solo cierra un clic que empieza y termina afuera, no una selección de texto que se suelta ahí. En el iPhone siguen siendo hojas inferiores y un toque afuera no las cierra. | Hoja inferior del ancho de la columna. | barato |
+| 77 | **Hover y manito solo con mouse (`hover: hover`), con una regla global en `index.css`; sin atajos de teclado** | Decisión de Gonza. Una regla cubre botones, links y filas con control nativo, sin acordarse en cada componente. En el iPhone no aplica. | Enter para completar la serie y Esc para volver: más código y riesgo de dispararse con el teclado del iPhone. `hover:` en cada componente. | barato |
+
 ## Pendiente
 - **Import de Hevy (fase 7), en pausa:** falta el `workouts.csv` real de Gonza; no hay
   documentación oficial de las columnas. Ya decidido: los ejercicios de Hevy que no están en

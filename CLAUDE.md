@@ -40,6 +40,8 @@ pará y preguntá.
   cintura, circunferencias y notas. Probado contra Supabase local con `wrangler dev`. **El
   import de Hevy está en pausa** hasta tener el `workouts.csv` real (decisiones ya tomadas en
   `decisiones.md`, Pendiente). Sin tablas nuevas.
+- **Mac (rama `desktop-layout`, sale de `fase-7`):** en pantallas anchas la app es una columna
+  de 402 px centrada, las hojas son modales y hay hover con mouse. En el iPhone no cambia nada.
 - **Datos cargados por SQL:** 273 pesajes históricos (11/10/2025 al 15/11/2026), el 15/11/2026.
 
 ## Plan por fases
@@ -315,6 +317,12 @@ worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), author
   principal de 56 pt.
 - **Toda operación async tiene indicador visible.** Para cargar, skeletons, nunca
   spinners. El estado vacío lleva una acción; el estado de error lleva "Reintentar".
+- **Pantallas anchas (la Mac):** la app es una columna de `max-w-app` (402 px, el ancho del
+  iPhone 17) centrada, sin pantallas aparte.
+  - Todo lo `fixed` se acota a la columna: `mx-auto max-w-app` si va de borde a borde,
+    `mx-auto max-w-[calc(var(--container-app)-2rem)]` si flota a 16 px del borde.
+  - Las hojas pasan a modal centrado desde `sm` y se cierran con un clic afuera.
+  - Hover y manito salen de una regla global en `index.css`, solo con mouse (`hover: hover`).
 - **Textos:**
   - Voseo. Si salió bien, decí qué pasó; si falló, hacete cargo y decí qué hacer.
   - Sin emojis y sin "exitosamente".
