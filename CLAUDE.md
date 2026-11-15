@@ -26,7 +26,7 @@ pará y preguntá.
 - **Fase 4 (rama `fase-4`, sale de `fase-3`):** Supabase (migración con RLS, cursor por
   secuencia y última escritura gana), Dexie v3 con marca de pendiente, motor de sync, login
   persistente, estado en Hoy y Ajustes, latido semanal. Probado contra Supabase local. Falta el
-  proyecto real: `.env` con URL y clave publicable, `.mcp.json` y `supabase db push`.
+  proyecto real: `.env` con URL y clave publicable y `supabase db push`.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -80,6 +80,9 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - Columnas en snake_case con los mismos nombres que la app. Cada tabla: `user_id` con RLS,
   `actualizado_en` (hora del teléfono: gana la más nueva; el trigger ignora una más vieja),
   `eliminado_en` (borrado lógico, sin `delete`) y `secuencia` (cursor del pull).
+- **Para analizar los datos:** el MCP `supabase` de `.mcp.json` (proyecto
+  `wuampfwqeqbqbbxdqzzq`, `read_only=true`) deja consultar con SQL. Se autentica una vez con
+  `/mcp` en Claude Code. Para escribir esquema se usan migraciones, nunca el MCP.
 - `public.latido()` existe solo para el cron semanal (`.github/workflows/latido.yml`) que
   evita la pausa del plan gratuito.
 

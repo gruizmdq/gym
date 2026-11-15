@@ -97,5 +97,5 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 ## Pendiente
 - **Probar la fase 1 en el iPhone** después del primer deploy: barra de estado, splash,
   tab bar sobre la barra de inicio y modo avión.
-- **Proyecto real de Supabase:** project ref y clave publicable para `.env` y `.mcp.json`;
+- **Proyecto real de Supabase** (`wuampfwqeqbqbbxdqzzq`, MCP ya configurado): clave publicable para `.env`;
   migración aplicada con `npx supabase db push`; usuario creado y signups apagados.
