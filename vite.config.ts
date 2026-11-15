@@ -66,12 +66,15 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
         navigateFallback: '/index.html',
+        // The Worker's routes (remote MCP and its sign-in): if Safari has the app's service
+        // worker, opening the sign-in page would show the app instead.
+        navigateFallbackDenylist: [/^\/(mcp|authorize|token|register)(\/|$)/, /^\/\.well-known\//],
         cleanupOutdatedCaches: true,
       },
     }),
   ],
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'worker/**/*.test.ts'],
   },
 })
