@@ -4,6 +4,7 @@ import { BodyPage } from '../features/body/BodyPage'
 import { ExercisePage } from '../features/exercise/ExercisePage'
 import { ExerciseHistoryPage } from '../features/history/ExerciseHistoryPage'
 import { HistoryPage } from '../features/history/HistoryPage'
+import { RoutinePage } from '../features/routine/RoutinePage'
 import { SessionLayout, SessionPage } from '../features/session/SessionPage'
 import { SettingsPage } from '../features/settings/SettingsPage'
 import { SummaryPage } from '../features/summary/SummaryPage'
@@ -33,5 +34,7 @@ export const router = createBrowserRouter([
   { path: '/summary/:id', Component: SummaryPage },
   // One exercise's history is full screen, like the summary: no tab bar.
   { path: '/history/exercise/:exerciseId', Component: ExerciseHistoryPage },
+  // The whole routine, one day at a time: full screen, opened from Today's rotation.
+  { path: '/routine/:day?', Component: RoutinePage },
   { path: '/sign-in', Component: SignInPage },
 ])

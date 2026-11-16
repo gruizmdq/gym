@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { changeCurrentPlan } from '../../data/actions'
 import type { Weight } from '../../data/db'
 import { addDays, type IsoDate } from '../../domain/dates'
@@ -105,38 +106,47 @@ export function UpNextCard({ e }: { e: Training }) {
         aria-label="Rotación del plan"
       >
         {e.rotation.map(({ day: d, state }) => (
-          <li
-            key={d.key}
-            className={`flex flex-col items-center gap-1.5 rounded-[14px] pt-2 pb-1.5 font-semibold text-caption ${
-              state === 'up-next' ? 'bg-accent-soft text-accent-ink' : 'text-ink-3'
-            }`}
-          >
-            <span
-              className={`flex size-[30px] items-center justify-center rounded-full font-bold text-[12px] ${
-                state === 'up-next'
-                  ? 'bg-accent text-white'
-                  : state === 'done'
-                    ? 'bg-ink text-white'
-                    : state === 'skipped'
-                      ? 'border-[1.5px] border-line-strong border-dashed text-ink-3'
-                      : 'bg-fill text-ink-2'
+          <li key={d.key}>
+            {/* Each day opens its full routine. */}
+            <Link
+              to={`/routine/${d.key}`}
+              className={`flex min-h-11 flex-col items-center gap-1.5 rounded-[14px] pt-2 pb-1.5 font-semibold text-caption ${
+                state === 'up-next' ? 'bg-accent-soft text-accent-ink' : 'text-ink-3'
               }`}
             >
-              {state === 'done' ? tick : abbreviation(d)}
-            </span>
-            {d.name}
-            <span className="sr-only">
-              {state === 'done'
-                ? ', hecho'
-                : state === 'skipped'
-                  ? ', salteado'
-                  : state === 'up-next'
-                    ? ', toca hoy'
-                    : ''}
-            </span>
+              <span
+                className={`flex size-[30px] items-center justify-center rounded-full font-bold text-[12px] ${
+                  state === 'up-next'
+                    ? 'bg-accent text-white'
+                    : state === 'done'
+                      ? 'bg-ink text-white'
+                      : state === 'skipped'
+                        ? 'border-[1.5px] border-line-strong border-dashed text-ink-3'
+                        : 'bg-fill text-ink-2'
+                }`}
+              >
+                {state === 'done' ? tick : abbreviation(d)}
+              </span>
+              {d.name}
+              <span className="sr-only">
+                {state === 'done'
+                  ? ', hecho'
+                  : state === 'skipped'
+                    ? ', salteado'
+                    : state === 'up-next'
+                      ? ', toca hoy'
+                      : ''}
+              </span>
+            </Link>
           </li>
         ))}
       </ol>
+      <Link
+        to={`/routine/${day.key}`}
+        className="-my-2 flex h-11 items-center self-start font-semibold text-accent text-sub"
+      >
+        Ver la rutina completa
+      </Link>
 
       {e.notices.map((notice) => (
         <p

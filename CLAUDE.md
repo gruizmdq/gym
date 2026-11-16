@@ -50,6 +50,10 @@ pará y preguntá.
   probarlo en el iPhone** (el navegador integrado de la app de Claude no tiene service worker
   ni notificaciones).
 - **Datos cargados por SQL:** 273 pesajes históricos (11/10/2025 al 15/11/2026), el 15/11/2026.
+- **Rutina completa (rama `routine-view`):** `/routine/:day` muestra todos los días del plan, de
+  a uno, con la ficha de prescripción de cada ejercicio. Se entra desde los días de la rotación
+  en Hoy o desde "Ver la rutina completa". Arranca en el plan y la semana actuales; se puede ver
+  el otro plan y cualquier semana del mesociclo (`?plan=4d&week=5`). Solo lee.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |

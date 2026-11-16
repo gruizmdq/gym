@@ -164,6 +164,14 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 86 | **"Terminó el descanso · Sigue Prensa · serie 3 de 3"**; al tocarlo, la app donde estaba | Decisión de Gonza. Sale de los mismos slots que la pantalla de la sesión. | Solo el título. Peso y reps de la serie: el prellenado vive en la pantalla del ejercicio. Abrir siempre el ejercicio que sigue. | barato |
 | 87 | **Cada dispositivo con el aviso prendido avisa los descansos que ve** | Decisión de Gonza. En la práctica avisa el que se usa para entrenar: el otro ve el descanso recién cuando sincroniza. | Solo el dispositivo donde empezó el descanso: un dato más en la sesión. | barato |
 
+## Rutina completa (16/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 88 | **Se entra desde Hoy: los días de la rotación abren su rutina, más un link "Ver la rutina completa"** | Decisión de Gonza. No suma una pestaña a la barra (decisión 20). | Una sección en Ajustes; una quinta pestaña. | barato |
+| 89 | **Muestra la semana y el plan actuales, con selectores para cualquier semana del mesociclo y para el otro plan** | Decisión de Gonza. Ver la semana que viene (o la descarga) sirve para planificar. El mesociclo queda fijo: decide el principal de Lower A. | Solo la semana actual; la rutina base sin ajustar por semana. | barato |
+| 90 | **Cada ejercicio con la misma ficha de prescripción que la pantalla del ejercicio** (`PrescriptionCard`, ahora compartida), más el lado que va primero, la alternancia por mesociclo y las alternativas | Decisión de Gonza. Una sola ficha: lo que se ve en la rutina es lo que se ve al entrenar. | Una lista compacta como la de Hoy. | barato |
+
 ## Pendiente
 - **Fase 8, probar en el iPhone** (el secreto `VAPID_PRIVATE_KEY` ya está cargado): activar en
   Ajustes, bloquear el teléfono durante un descanso, +15 s, Saltar, la app a la vista, el
