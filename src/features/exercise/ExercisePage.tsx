@@ -22,19 +22,15 @@ import { buildRows, completesSet, currentRow, type Row, type Side } from '../../
 import { routine } from '../../routine/routine'
 import { button } from '../../ui/buttons'
 import { useKeyboardHeight } from '../../ui/device'
-import { clock, formatNumber, range, setsSummary, shortDate } from '../../ui/format'
+import { clock, formatNumber, setsSummary, shortDate } from '../../ui/format'
 import { Stepper } from '../../ui/Stepper'
 import { useNow } from '../../ui/useNow'
 import { nextSlot, type SessionSlot, sessionDay, sessionSlots, unitLabel } from '../session/model'
 import { AlternativesSheet, OptionsSheet } from './ExerciseSheets'
+import { PrescriptionCard } from './PrescriptionCard'
 
 const SIDE = { left: 'Izquierda', right: 'Derecha' } as const
 const SIDE_SHORT = { left: 'IZQ', right: 'DER' } as const
-const TECHNIQUE_HINT = {
-  'rest-pause': 'al fallo, 15–20 s y 2 mini-series',
-  'drop-set': 'al fallo, bajá 25 % y seguí hasta casi el fallo',
-  'lengthened-partials': 'después de las reps completas, 4–6 medias reps en la parte estirada',
-} as const
 
 const rowKey = (r: { number: number; side: string | null }) => `${r.number}:${r.side ?? '-'}`
 
@@ -430,64 +426,6 @@ function repsToMatch(rows: Row[], row: Row, current: SessionSlot): number | null
   if (!row.side || row.side === firstSide || row.done) return null
   const first = rows.find((r) => r.number === row.number && r.side === firstSide && r.done)
   return first ? first.reps : null
-}
-
-function PrescriptionCard({ current, deloadWeek }: { current: SessionSlot; deloadWeek: boolean }) {
-  const { slot, technique } = current
-  const pauseSeconds = Number(slot.tempo.split('-')[1] ?? 0)
-  return (
-    <section className="overflow-hidden rounded-card bg-surface" aria-label="Prescripción">
-      <dl className="grid grid-cols-4 py-3">
-        {[
-          ['Series', `${current.sets} × ${range(current.reps)}`],
-          ['Descanso', clock(slot.rest * 1000)],
-          ['Cadencia', slot.tempo === 'slow' ? 'lenta' : slot.tempo],
-          ['RIR', current.rir ? (current.rir.max === 0 ? 'Fallo' : range(current.rir)) : '—'],
-        ].map(([k, v]) => (
-          <div
-            key={k}
-            className="flex flex-col items-center gap-0.5 border-line border-r last:border-r-0"
-          >
-            <dt className="font-semibold text-[12px] text-ink-3 leading-4">{k}</dt>
-            <dd className="font-bold font-num text-[18px] leading-[22px]">{v}</dd>
-          </div>
-        ))}
-      </dl>
-      {technique && (
-        <p
-          className={`flex items-center gap-2 border-line border-t px-3.5 py-2.5 text-[14px] leading-[19px] ${technique.applies ? 'bg-tech-soft text-tech' : 'bg-surface-2 text-ink-2'}`}
-        >
-          {technique.applies ? (
-            <span>
-              <b className="font-semibold">{TECHNIQUE_LABEL[technique.type]} en la última serie:</b>{' '}
-              {TECHNIQUE_HINT[technique.type]}
-            </span>
-          ) : deloadWeek ? (
-            <span>Descarga: sin {TECHNIQUE_LABEL[technique.type]} esta semana.</span>
-          ) : (
-            <span>
-              {TECHNIQUE_LABEL[technique.type]} en la última serie
-              {technique.fromWeek ? ` desde la semana ${technique.fromWeek}` : ''}.
-            </span>
-          )}
-        </p>
-      )}
-      {slot.pause && (
-        <p className="flex items-center gap-2 border-line border-t bg-surface-2 px-3.5 py-2.5 text-[14px] text-ink-2 leading-[19px]">
-          <Icon size={18} d="M12 5v14M18 13l-6 6-6-6" />
-          <span>
-            <b className="font-semibold text-ink">Pausa de {pauseSeconds || 1} s estirado:</b>{' '}
-            {slot.pause}
-          </span>
-        </p>
-      )}
-      {slot.note && (
-        <p className="border-line border-t px-3.5 py-2.5 text-[14px] text-ink-2 leading-[19px]">
-          {slot.note}
-        </p>
-      )}
-    </section>
-  )
 }
 
 function LastTimeCard({ references }: { references: ReturnType<typeof lastTime> }) {
