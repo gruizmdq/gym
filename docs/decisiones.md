@@ -172,6 +172,16 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 89 | **Muestra la semana y el plan actuales, con selectores para cualquier semana del mesociclo y para el otro plan** | Decisión de Gonza. Ver la semana que viene (o la descarga) sirve para planificar. El mesociclo queda fijo: decide el principal de Lower A. | Solo la semana actual; la rutina base sin ajustar por semana. | barato |
 | 90 | **Cada ejercicio con la misma ficha de prescripción que la pantalla del ejercicio** (`PrescriptionCard`, ahora compartida), más el lado que va primero, la alternancia por mesociclo y las alternativas | Decisión de Gonza. Una sola ficha: lo que se ve en la rutina es lo que se ve al entrenar. | Una lista compacta como la de Hoy. | barato |
 
+## Peso con dos decimales (18/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 92 | **Peso corporal con hasta dos decimales: pesajes, promedios y cambio semanal** | Decisión de Gonza. La balanza mide de a 0,05 y el objetivo es +0,25: con un decimal el cambio no se puede comparar con el objetivo. Cintura y circunferencias siguen con uno. | Solo los pesajes. | barato |
+| 93 | **El stepper del peso suma de a 0,05; escribiendo se aceptan dos decimales y se redondea** | Los 273 pesajes históricos van todos de a 0,05. | De a 0,1; de a 0,01. | barato |
+| 94 | **Rango en los dos gráficos de peso: 5 sem, 3 meses o Todo, compartido entre Diario y Semanal; arranca en 5 sem** | Decisión de Gonza. Con el historial desde octubre de 2025 hace falta ver todo sin perder el detalle de las últimas semanas. Una fecha del eje que no entra se omite. | Solo un gráfico más largo. | barato |
+| 95 | **El objetivo del semanal arranca en el primer promedio visible y no define la escala: si se va de rango, se corta arriba** | Decisión de Gonza (arranque). La escala por los promedios evita que el objetivo aplaste el gráfico: desde el primer pesaje, a hoy marcaba unos +14 kg. | Arrancar en el inicio del bulk. | barato |
+| 96 | **Lista de todos los pesajes por semana (lun–dom), la más nueva arriba, solo para ver** | Decisión de Gonza: los valores exactos, además del gráfico. Cargar y editar sigue siendo hoy o ayer (decisión 60). | Editar desde la lista. | barato |
+
 ## Pendiente
 - **Fase 8, probar en el iPhone** (el secreto `VAPID_PRIVATE_KEY` ya está cargado): activar en
   Ajustes, bloquear el teléfono durante un descanso, +15 s, Saltar, la app a la vista, el
