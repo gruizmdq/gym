@@ -238,4 +238,31 @@ describe('sync', () => {
     expect(await db.sessions.get(session().id)).toEqual({ ...session(), pending: 0 })
     expect(await db.sets.get(set().id)).toEqual({ ...set(), pending: 0 })
   })
+
+  // A new database seeds the first mesocycle. After reinstalling, that seed used to go up as the
+  // newest version and put the start back to 7/12.
+  it("a reinstalled phone keeps the server's first mesocycle, not its own seed", async () => {
+    const server = new FakeServer()
+    server.write('mesocycles', `${USER}|1`, {
+      number: 1,
+      plan: '5d',
+      start: '2026-11-14',
+      updated_at: '2026-11-14T22:00:00.000Z',
+    })
+    await sync(server, USER)
+
+    expect(await db.mesocycles.get(1)).toMatchObject({ start: '2026-11-14', pending: 0 })
+    expect(server.table('mesocycles').get(`${USER}|1`)).toMatchObject({ start: '2026-11-14' })
+  })
+
+  it('with nothing on the server, the seeded mesocycle goes up', async () => {
+    const server = new FakeServer()
+    await sync(server, USER)
+
+    expect(server.table('mesocycles').get(`${USER}|1`)).toMatchObject({
+      number: 1,
+      start: '2026-12-07',
+    })
+    expect(await db.mesocycles.get(1)).toMatchObject({ start: '2026-12-07', pending: 0 })
+  })
 })

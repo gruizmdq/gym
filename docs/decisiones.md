@@ -172,6 +172,12 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 89 | **Muestra la semana y el plan actuales, con selectores para cualquier semana del mesociclo y para el otro plan** | Decisión de Gonza. Ver la semana que viene (o la descarga) sirve para planificar. El mesociclo queda fijo: decide el principal de Lower A. | Solo la semana actual; la rutina base sin ajustar por semana. | barato |
 | 90 | **Cada ejercicio con la misma ficha de prescripción que la pantalla del ejercicio** (`PrescriptionCard`, ahora compartida), más el lado que va primero, la alternancia por mesociclo y las alternativas | Decisión de Gonza. Una sola ficha: lo que se ve en la rutina es lo que se ve al entrenar. | Una lista compacta como la de Hoy. | barato |
 
+## Mesociclo al reinstalar (15/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 91 | **La siembra del mesociclo 1 va con `updatedAt: 0`** | Una base nueva (reinstalar) lo sembraba con la hora actual y en el primer sync pisaba el inicio guardado en el servidor: volvía al 7/12. Como versión más vieja posible, el trigger ignora su push y el pull trae la del servidor. | Bajar antes de subir en el primer sync: toca el motor para un solo caso. | barato |
+
 ## Peso con dos decimales (18/11/2026)
 
 | # | Decisión | Por qué | Descartado | Revertir |
