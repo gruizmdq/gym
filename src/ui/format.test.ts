@@ -1,5 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { parseNumber, setsSummary } from './format'
+import { formatKg, formatKgChange, parseNumber, setsSummary } from './format'
+
+describe('body weight, up to two decimals', () => {
+  it.each([
+    [74.05, '74,05'],
+    [74.9, '74,9'],
+    [75, '75,0'],
+    [75.033, '75,03'],
+  ])('%s → %s', (n, expected) => {
+    expect(formatKg(n)).toBe(expected)
+  })
+
+  it.each([
+    [0.25, '+0,25'],
+    [-0.3, '-0,3'],
+    [-0.004, '+0,0'],
+    [0.004, '+0,0'],
+  ])('change %s → %s', (n, expected) => {
+    expect(formatKgChange(n)).toBe(expected)
+  })
+})
 
 describe('parseNumber', () => {
   it.each([

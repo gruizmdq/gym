@@ -3,11 +3,14 @@ import {
   circumferencesDue,
   paceAlert,
   paceOf,
+  rangeStart,
+  type WeightRange,
   waistAverage,
   waistSummary,
   weekChange,
   weeklyAverages,
   weekStart,
+  weighingWeeks,
 } from './body'
 import { addDays } from './dates'
 
@@ -146,5 +149,59 @@ describe('pace of a weekly change', () => {
     [0.42, 'too-fast'],
   ])('%s → %s', (change, pace) => {
     expect(paceOf(change)).toBe(pace)
+  })
+})
+
+describe('chart ranges', () => {
+  // Wednesday 18/11/2026: its week starts on Monday the 16th.
+  it.each<[WeightRange, string, string]>([
+    ['5w', '2026-10-19', 'Monday four weeks back, five weeks in all'],
+    ['3m', '2026-08-24', 'Monday twelve weeks back, thirteen weeks in all'],
+    ['all', '2025-10-06', 'Monday of the first weighing (Saturday 11/10/2025)'],
+  ])('%s → %s (%s)', (range, start) => {
+    expect(rangeStart(range, '2026-11-18', '2025-10-11')).toBe(start)
+  })
+
+  it('everything, with no weighings, is just this week', () => {
+    expect(rangeStart('all', '2026-11-18', null)).toBe('2026-11-16')
+  })
+})
+
+describe('all the weighings, by week', () => {
+  const weights = [
+    ...week('2026-11-02', [74, 74.2, 74.1]),
+    // 9–15/11: only Monday and Sunday, out of order.
+    { date: '2026-11-15', kg: 74.05 },
+    { date: '2026-11-09', kg: 73.9 },
+    ...week('2026-11-16', [74.3, 74.45, 74.5]),
+    // A gap: nothing in October's last week.
+    ...week('2026-10-19', [73.5, 73.6, 73.7]),
+  ]
+  const result = weighingWeeks(weights)
+
+  it('newest week first, empty weeks left out', () => {
+    expect(result.map((w) => w.start)).toEqual([
+      '2026-11-16',
+      '2026-11-09',
+      '2026-11-02',
+      '2026-10-19',
+    ])
+  })
+
+  it('inside a week, the newest day first; Sunday stays in the week that started on Monday', () => {
+    expect(result[1]?.weighings).toEqual([
+      { date: '2026-11-15', kg: 74.05 },
+      { date: '2026-11-09', kg: 73.9 },
+    ])
+    expect(result[1]?.count).toBe(2)
+  })
+
+  it('the change only when both weeks have 3 weighings and are consecutive', () => {
+    expect(result.map((w) => w.change)).toEqual([null, null, null, null])
+    const full = weighingWeeks([
+      ...week('2026-11-09', [74, 74, 74]),
+      ...week('2026-11-16', [74.25, 74.25, 74.25]),
+    ])
+    expect(full.map((w) => w.change)).toEqual([0.25, null])
   })
 })
