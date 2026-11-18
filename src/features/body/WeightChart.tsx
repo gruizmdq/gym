@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import type { Weight } from '../../data/db'
-import { PACE, weeklyAverages, weekStart } from '../../domain/body'
+import { PACE, rangeStart, type WeightRange, weeklyAverages, weekStart } from '../../domain/body'
 import { addDays, daysBetween, type IsoDate } from '../../domain/dates'
-import { formatNumber, longDate } from '../../ui/format'
-import { dayMonth, oneDecimal, segment, segmentButton } from './parts'
+import { formatKg, formatNumber, longDate } from '../../ui/format'
+import { dayMonth, segment, segmentButton } from './parts'
 
 // Hand-built SVG, same frame as the canvases: y labels on the left, x labels below.
 const W = 338
@@ -12,7 +12,6 @@ const LEFT = 30
 const TOP = 14
 const BOTTOM = 124
 const LABEL_Y = 142
-const DAYS = 35 // five weeks, Monday to Sunday
 
 const r = (n: number) => n.toFixed(1)
 const byDate = (a: { date: IsoDate }, b: { date: IsoDate }) => (a.date < b.date ? -1 : 1)
@@ -59,26 +58,61 @@ function LegendLine({ dashed }: { dashed?: boolean }) {
   )
 }
 
-// The last five weeks: each weighing as a dot and each week's average as a segment.
-function Daily({ weights, today }: { weights: Weight[]; today: IsoDate }) {
-  const from = addDays(weekStart(today), -28)
-  const step = (W - 4 - LEFT) / (DAYS - 1)
+const RANGES: [WeightRange, string][] = [
+  ['5w', '5 sem'],
+  ['3m', '3 meses'],
+  ['all', 'Todo'],
+]
+const EMPTY: Record<WeightRange, string> = {
+  '5w': 'No hay pesajes en las últimas 5 semanas.',
+  '3m': 'No hay pesajes en los últimos 3 meses.',
+  all: 'Todavía no hay pesajes.',
+}
+const spokenRange = (range: WeightRange, from: IsoDate) =>
+  range === '5w'
+    ? 'de las últimas 5 semanas'
+    : range === '3m'
+      ? 'de los últimos 3 meses'
+      : `desde el ${dayMonth(from)}`
+
+const Empty = ({ range }: { range: WeightRange }) => (
+  <p className="py-6 text-center text-ink-3 text-sub">{EMPTY[range]}</p>
+)
+
+// Each weighing in the range as a dot and each week's average as a segment. The range runs from
+// its first Monday to this week's Sunday.
+function Daily({
+  weights,
+  today,
+  from,
+  range,
+}: {
+  weights: Weight[]
+  today: IsoDate
+  from: IsoDate
+  range: WeightRange
+}) {
+  const days = daysBetween(from, weekStart(today)) + 7
+  const step = (W - 4 - LEFT) / (days - 1)
   const x = (d: IsoDate) => LEFT + daysBetween(from, d) * step
   const shown = weights.filter((w) => w.date >= from).sort(byDate)
   const last = shown.at(-1)
   const weeks = weeklyAverages(shown)
   const lastWeek = weeks.at(-1)
 
-  if (!last || !lastWeek) {
-    return (
-      <p className="py-6 text-center text-ink-3 text-sub">
-        No hay pesajes en las últimas 5 semanas.
-      </p>
-    )
-  }
+  if (!last || !lastWeek) return <Empty range={range} />
 
   const { y, ticks } = yScale(shown.map((w) => w.kg))
-  const mondays = [0, 1, 2, 3, 4].map((i) => addDays(from, i * 7))
+  // The more days, the smaller the dots.
+  const dot = days <= 35 ? 2.6 : days <= 91 ? 2 : 1.4
+  // Every Monday on five weeks; about five of them on longer ranges.
+  const every = Math.ceil(days / 7 / 5)
+  const mondays: IsoDate[] = []
+  for (let i = 0; i < days / 7; i += every) mondays.push(addDays(from, i * 7))
+  // A date that doesn't fit before the right edge is left out (about 6 px per character).
+  const labels = mondays.filter(
+    (d, i) => i === 0 || x(d) + axisDate(d, mondays[i - 1]).length * 6 <= W,
+  )
   const averages = weeks
     .map((w) => {
       const sunday = addDays(w.start, 6)
@@ -93,7 +127,7 @@ function Daily({ weights, today }: { weights: Weight[]; today: IsoDate }) {
         width={W}
         height={H}
         role="img"
-        aria-label={`Peso diario de las últimas 5 semanas con el promedio de cada semana. Último pesaje: ${oneDecimal(last.kg)} kilos, el ${longDate(last.date)}. Promedio de esa semana: ${oneDecimal(lastWeek.average)} kilos.`}
+        aria-label={`Peso diario ${spokenRange(range, from)} con el promedio de cada semana. Último pesaje: ${formatKg(last.kg)} kilos, el ${longDate(last.date)}. Promedio de esa semana: ${formatKg(lastWeek.average)} kilos.`}
         className="h-auto w-full fill-ink-3 text-[11px]"
       >
         <Grid ticks={ticks} y={y} />
@@ -104,7 +138,7 @@ function Daily({ weights, today }: { weights: Weight[]; today: IsoDate }) {
                 key={w.date}
                 cx={r(x(w.date))}
                 cy={r(y(w.kg))}
-                r={2.6}
+                r={dot}
                 className="fill-accent-mid"
               />
             ),
@@ -123,9 +157,9 @@ function Daily({ weights, today }: { weights: Weight[]; today: IsoDate }) {
           strokeWidth={2}
           className="fill-accent stroke-surface"
         />
-        {mondays.map((d, i) => (
+        {labels.map((d, i) => (
           <text key={d} x={r(x(d))} y={LABEL_Y}>
-            {axisDate(d, mondays[i - 1])}
+            {axisDate(d, labels[i - 1])}
           </text>
         ))}
       </svg>
@@ -143,19 +177,28 @@ function Daily({ weights, today }: { weights: Weight[]; today: IsoDate }) {
   )
 }
 
-// Every weekly average since the first weighing, against +0,25 kg a week from the first one.
-function Weekly({ weights }: { weights: Weight[] }) {
-  const weeks = weeklyAverages(weights)
+// The weekly averages in the range, against +0,25 kg a week from the first one shown. The scale
+// follows the averages: a target out of it is cut at the edge instead of flattening the chart.
+function Weekly({
+  weights,
+  from,
+  range,
+}: {
+  weights: Weight[]
+  from: IsoDate
+  range: WeightRange
+}) {
+  const weeks = weeklyAverages(weights).filter((w) => w.start >= from)
   const first = weeks[0]
   const last = weeks.at(-1)
-  if (!first || !last) return null
+  if (!first || !last) return <Empty range={range} />
 
   const RIGHT = W - 10
   const n = daysBetween(first.start, last.start) / 7
   const x = (start: IsoDate) =>
     n === 0 ? LEFT : LEFT + (daysBetween(first.start, start) / 7) * ((RIGHT - LEFT) / n)
   const target = first.average + PACE.target * n
-  const { y, ticks } = yScale([...weeks.map((w) => w.average), target])
+  const { y, ticks } = yScale(weeks.map((w) => w.average))
   const radius = n === 0 ? 4 : Math.min(4, (RIGHT - LEFT) / n / 3)
   const lastY = y(last.average)
 
@@ -172,15 +215,21 @@ function Weekly({ weights }: { weights: Weight[] }) {
         width={W}
         height={H}
         role="img"
-        aria-label={`Promedio semanal desde el ${dayMonth(first.start)}: de ${oneDecimal(first.average)} a ${oneDecimal(last.average)} kilos, contra el objetivo de más ${formatNumber(PACE.target)} por semana, que a esta altura es ${oneDecimal(target)}.`}
+        aria-label={`Promedio semanal desde el ${dayMonth(first.start)}: de ${formatKg(first.average)} a ${formatKg(last.average)} kilos, contra el objetivo de más ${formatNumber(PACE.target)} por semana desde esa semana, que a esta altura es ${formatKg(target)}.`}
         className="h-auto w-full fill-ink-3 text-[11px]"
       >
+        <defs>
+          <clipPath id="weekly-plot">
+            <rect x={LEFT} y={0} width={W - LEFT} height={BOTTOM + 4} />
+          </clipPath>
+        </defs>
         <Grid ticks={ticks} y={y} />
         <path
           d={`M${r(x(first.start))} ${r(y(first.average))} L${r(x(last.start))} ${r(y(target))}`}
           fill="none"
           strokeWidth={1.5}
           strokeDasharray="4 4"
+          clipPath="url(#weekly-plot)"
           className="stroke-ink"
         />
         <path
@@ -216,7 +265,7 @@ function Weekly({ weights }: { weights: Weight[] }) {
           textAnchor={n === 0 ? 'start' : 'end'}
           className="fill-ink font-bold"
         >
-          {oneDecimal(last.average)}
+          {formatKg(last.average)}
         </text>
         {labelled.map((i, k) => {
           const d = addDays(first.start, i * 7)
@@ -249,30 +298,58 @@ function Weekly({ weights }: { weights: Weight[] }) {
 
 export function WeightChart({ weights, today }: { weights: Weight[]; today: IsoDate }) {
   const [mode, setMode] = useState<'daily' | 'weekly'>('daily')
+  const [range, setRange] = useState<WeightRange>('5w')
+  const first = weights.reduce<IsoDate | null>(
+    (min, w) => (!min || w.date < min ? w.date : min),
+    null,
+  )
+  const from = rangeStart(range, today, first)
   return (
     <>
-      <fieldset>
-        <legend className="sr-only">Gráfico</legend>
-        <div className={segment}>
-          {(
-            [
-              ['daily', 'Diario'],
-              ['weekly', 'Semanal'],
-            ] as const
-          ).map(([m, label]) => (
-            <button
-              key={m}
-              type="button"
-              aria-pressed={mode === m}
-              onClick={() => setMode(m)}
-              className={segmentButton(mode === m)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </fieldset>
-      {mode === 'daily' ? <Daily weights={weights} today={today} /> : <Weekly weights={weights} />}
+      <div className="flex flex-col gap-2">
+        <fieldset>
+          <legend className="sr-only">Gráfico</legend>
+          <div className={segment}>
+            {(
+              [
+                ['daily', 'Diario'],
+                ['weekly', 'Semanal'],
+              ] as const
+            ).map(([m, label]) => (
+              <button
+                key={m}
+                type="button"
+                aria-pressed={mode === m}
+                onClick={() => setMode(m)}
+                className={segmentButton(mode === m)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend className="sr-only">Rango</legend>
+          <div className={segment}>
+            {RANGES.map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={range === value}
+                onClick={() => setRange(value)}
+                className={segmentButton(range === value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      </div>
+      {mode === 'daily' ? (
+        <Daily weights={weights} today={today} from={from} range={range} />
+      ) : (
+        <Weekly weights={weights} from={from} range={range} />
+      )}
     </>
   )
 }

@@ -57,6 +57,37 @@ export function paceAlert(weeks: WeekAverage[], today: IsoDate): boolean {
   return true
 }
 
+// The charts' ranges, Monday-aligned up to today's week: five weeks, three months (13 weeks) or
+// everything since the week of the first weighing.
+export type WeightRange = '5w' | '3m' | 'all'
+
+export function rangeStart(range: WeightRange, today: IsoDate, first: IsoDate | null): IsoDate {
+  if (range === '5w') return addDays(weekStart(today), -28)
+  if (range === '3m') return addDays(weekStart(today), -84)
+  return weekStart(first ?? today)
+}
+
+export interface WeighingWeek extends WeekAverage {
+  change: number | null
+  weighings: { date: IsoDate; kg: number }[]
+}
+
+// Every week with weighings for the full list: the newest first, each with its weighings
+// (newest first) and the change against the previous week when both can be compared.
+export function weighingWeeks(weights: { date: IsoDate; kg: number }[]): WeighingWeek[] {
+  const weeks = weeklyAverages(weights)
+  return weeks
+    .map((w) => ({
+      ...w,
+      change: weekChange(weeks, w.start),
+      weighings: weights
+        .filter((x) => weekStart(x.date) === w.start)
+        .sort((a, b) => (a.date < b.date ? 1 : -1))
+        .map(({ date, kg }) => ({ date, kg })),
+    }))
+    .reverse()
+}
+
 export function waistAverage(measurements: number[]): number {
   return round(measurements.reduce((t, m) => t + m, 0) / measurements.length, 1)
 }

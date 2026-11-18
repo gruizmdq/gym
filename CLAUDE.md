@@ -54,6 +54,9 @@ pará y preguntá.
   a uno, con la ficha de prescripción de cada ejercicio. Se entra desde los días de la rotación
   en Hoy o desde "Ver la rutina completa". Arranca en el plan y la semana actuales; se puede ver
   el otro plan y cualquier semana del mesociclo (`?plan=4d&week=5`). Solo lee.
+- **Peso con dos decimales (rama `body-weights`):** pesajes, promedios y cambio con hasta dos
+  decimales, stepper de a 0,05, rango 5 sem / 3 meses / Todo en los dos gráficos y la lista de
+  todos los pesajes (`/body/weights`). Sin tablas nuevas.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -299,6 +302,13 @@ worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), author
   - Peso diario, con promedio por semana de lunes a domingo y comparación con la semana
     anterior. Objetivo +0,25 kg/semana; aviso si pasa +0,4 tres semanas seguidas.
     - Un pesaje por día; se carga o edita el de hoy y el de ayer.
+    - Hasta dos decimales en pesajes, promedios y cambio semanal (74,05; +0,25). El stepper
+      suma de a 0,05; escribiendo se aceptan dos decimales y se redondea.
+    - Los dos gráficos tienen rango: 5 sem, 3 meses (13 semanas) o Todo, de lunes a hoy,
+      compartido entre Diario y Semanal; arranca en 5 sem. El objetivo del semanal arranca en el
+      primer promedio visible; la escala la definen los promedios y el objetivo se corta arriba.
+    - "Ver todos los pesajes" abre la lista por semana (lun–dom), la más nueva arriba, con su
+      promedio y el cambio si se puede comparar. Solo para ver.
     - Una semana necesita 3 pesajes para compararse y para el aviso. El aviso mira solo
       semanas terminadas.
   - Cintura semanal: se guardan las 3 mediciones y el promedio se calcula. Se compara con la

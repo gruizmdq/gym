@@ -4,18 +4,16 @@ import type { Weight } from '../../data/db'
 import { weekChange, weeklyAverages, weekStart } from '../../domain/body'
 import { addDays, type IsoDate } from '../../domain/dates'
 import { button } from '../../ui/buttons'
-import { capitalize, longDate, parseNumber, shortDate } from '../../ui/format'
-import { Sheet } from '../../ui/Sheet'
 import {
-  CloseButton,
-  changeTone,
-  chip,
-  KeyboardSpacer,
-  oneDecimal,
-  segment,
-  segmentButton,
-  signed,
-} from './parts'
+  capitalize,
+  formatKg,
+  formatKgChange,
+  longDate,
+  parseNumber,
+  shortDate,
+} from '../../ui/format'
+import { Sheet } from '../../ui/Sheet'
+import { CloseButton, changeTone, chip, KeyboardSpacer, segment, segmentButton } from './parts'
 
 const sign = (d: string) => (
   <svg
@@ -32,8 +30,8 @@ const sign = (d: string) => (
   </svg>
 )
 
-const STEP = 0.1
-const toKg = (n: number | null) => (n === null ? null : Number(n.toFixed(1)))
+const STEP = 0.05
+const toKg = (n: number | null) => (n === null ? null : Number(n.toFixed(2)))
 const byDate = (a: { date: IsoDate }, b: { date: IsoDate }) => (a.date < b.date ? -1 : 1)
 
 // One weighing per day, only for today or yesterday. Mounted while open, so every opening
@@ -67,7 +65,7 @@ export function WeightSheet({
     setText(null)
   }
   const add = (delta: number) =>
-    setKg((k) => (k === null ? k : Math.max(0, Number((k + delta).toFixed(1)))))
+    setKg((k) => (k === null ? k : Math.max(0, Number((k + delta).toFixed(2)))))
 
   // What the week would look like with this weighing saved.
   const draft = valid ? [...weights.filter((w) => w.date !== date), { date, kg }] : weights
@@ -124,7 +122,7 @@ export function WeightSheet({
           type="button"
           onClick={() => add(-STEP)}
           disabled={kg === null}
-          aria-label="Restar 0,1 kg"
+          aria-label="Restar 0,05 kg"
           className="flex size-16 shrink-0 items-center justify-center rounded-full bg-fill text-ink active:scale-95 disabled:opacity-50"
         >
           {sign('M5 12h14')}
@@ -135,7 +133,7 @@ export function WeightSheet({
             inputMode="decimal"
             enterKeyHint="done"
             autoComplete="off"
-            value={text ?? (kg === null ? '' : oneDecimal(kg))}
+            value={text ?? (kg === null ? '' : formatKg(kg))}
             placeholder="—"
             onFocus={(e) => {
               setText(e.currentTarget.value)
@@ -156,7 +154,7 @@ export function WeightSheet({
           type="button"
           onClick={() => add(STEP)}
           disabled={kg === null}
-          aria-label="Sumar 0,1 kg"
+          aria-label="Sumar 0,05 kg"
           className="flex size-16 shrink-0 items-center justify-center rounded-full bg-fill text-ink active:scale-95 disabled:opacity-50"
         >
           {sign('M5 12h14M12 5v14')}
@@ -168,7 +166,7 @@ export function WeightSheet({
           {previous && (
             <div className="flex min-h-11 items-center gap-3 border-fill border-b px-4 py-2 last:border-b-0">
               <dt className="flex-1 text-ink-2 text-sub">{dayName(previous.date)}</dt>
-              <dd className="font-num font-semibold">{oneDecimal(previous.kg)} kg</dd>
+              <dd className="font-num font-semibold">{formatKg(previous.kg)} kg</dd>
             </div>
           )}
           {week && (
@@ -178,14 +176,14 @@ export function WeightSheet({
                   ? 'Promedio de esta semana'
                   : 'Promedio de la semana pasada'}
               </dt>
-              <dd className="font-num font-semibold">{oneDecimal(week.average)} kg</dd>
+              <dd className="font-num font-semibold">{formatKg(week.average)} kg</dd>
             </div>
           )}
           {change !== null && (
             <div className="flex min-h-11 items-center gap-3 border-fill border-b px-4 py-2 last:border-b-0">
               <dt className="flex-1 text-ink-2 text-sub">Vs semana anterior</dt>
               <dd className={`${chip} h-[26px] font-num text-foot ${changeTone(change)}`}>
-                {signed(change)} kg
+                {formatKgChange(change)} kg
               </dd>
             </div>
           )}
@@ -198,7 +196,7 @@ export function WeightSheet({
         disabled={!valid || saving}
         onClick={() => void save()}
       >
-        {saving ? 'Guardando…' : valid ? `Guardar ${oneDecimal(kg)} kg` : 'Guardar'}
+        {saving ? 'Guardando…' : valid ? `Guardar ${formatKg(kg)} kg` : 'Guardar'}
       </button>
       <KeyboardSpacer />
     </Sheet>

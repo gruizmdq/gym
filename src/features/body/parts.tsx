@@ -1,8 +1,9 @@
 import { useId } from 'react'
 import type { Circumferences, Syncable } from '../../data/db'
 import { paceOf } from '../../domain/body'
-import type { IsoDate } from '../../domain/dates'
+import { addDays, type IsoDate } from '../../domain/dates'
 import { useKeyboardHeight } from '../../ui/device'
+import { shortDate } from '../../ui/format'
 
 // Pieces shared by the body screen, its sheets and the "Peso de hoy" card on Today.
 
@@ -26,6 +27,22 @@ export const oneDecimal = (n: number) => oneDecimalFormat.format(n)
 
 /** +1,0 or -0,3. A change that rounds to zero shows as +0,0, never -0,0. */
 export const signed = (n: number) => signedFormat.format(Number(n.toFixed(1)) || 0)
+
+const dayOfWeekFormat = new Intl.DateTimeFormat('es-AR', {
+  weekday: 'short',
+  day: 'numeric',
+  timeZone: 'UTC',
+})
+
+/** "lun 1 – dom 7 feb", or "lun 26 ene – dom 1 feb" when the week spans two months */
+export function weekRange(start: IsoDate): string {
+  const end = addDays(start, 6)
+  const from =
+    start.slice(5, 7) === end.slice(5, 7)
+      ? dayOfWeekFormat.format(new Date(`${start}T12:00:00Z`)).replace(/[.,]/g, '')
+      : shortDate(start)
+  return `${from} – ${shortDate(end)}`
+}
 
 /** 1 de enero */
 export const dayMonth = (d: IsoDate) => dayMonthFormat.format(new Date(`${d}T12:00:00Z`))

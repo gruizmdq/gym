@@ -54,6 +54,22 @@ const numberFormat = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 }
 /** 62,5 */
 export const formatNumber = (n: number) => numberFormat.format(n)
 
+const kgFormat = new Intl.NumberFormat('es-AR', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 2,
+})
+const kgChangeFormat = new Intl.NumberFormat('es-AR', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 2,
+  signDisplay: 'always',
+})
+
+/** Body weight, up to two decimals: 74,05 · 74,9 · 75,0 */
+export const formatKg = (n: number) => kgFormat.format(n)
+
+/** A body weight change: +0,25 or -0,3. One that rounds to zero shows as +0,0, never -0,00. */
+export const formatKgChange = (n: number) => kgChangeFormat.format(Number(n.toFixed(2)) || 0)
+
 /** Accepts "62,5" and "62.5" (the es-AR decimal keyboard has a comma). */
 export function parseNumber(text: string): number | null {
   const clean = text.trim().replace(',', '.')
