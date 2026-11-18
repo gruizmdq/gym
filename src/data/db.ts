@@ -120,8 +120,11 @@ export const SYNCED_TABLES = [
   'circumferences',
 ] as const
 
+// The seed is the oldest possible version (updatedAt 0): on a reinstalled phone, the server's
+// first mesocycle wins (the trigger ignores the push) and comes back down in the pull. With
+// nothing on the server, the seed goes up as usual.
 function seedInitialMesocycle(tx: Transaction) {
-  return tx.table('mesocycles').add({ ...INITIAL_MESOCYCLE, updatedAt: Date.now(), pending: 1 })
+  return tx.table('mesocycles').add({ ...INITIAL_MESOCYCLE, updatedAt: 0, pending: 1 })
 }
 
 // Versions 1–3 had Spanish names and held no real data. Version 4 drops every table: Dexie
