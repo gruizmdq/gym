@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { Link } from 'react-router'
 import type { Circumferences, Waist, Weight } from '../../data/db'
 import { useCircumferences, useWaists, useWeights } from '../../data/queries'
 import {
@@ -12,7 +13,7 @@ import {
 } from '../../domain/body'
 import { addDays, type IsoDate, isoDate } from '../../domain/dates'
 import { button } from '../../ui/buttons'
-import { capitalize, formatNumber, longDate, shortDate } from '../../ui/format'
+import { capitalize, formatKg, formatNumber, longDate, shortDate } from '../../ui/format'
 import { Page } from '../../ui/Page'
 import { CircumferencesSheet } from './CircumferencesSheet'
 import {
@@ -23,6 +24,7 @@ import {
   mediumButton,
   oneDecimal,
   signed,
+  weekRange,
 } from './parts'
 import { WaistSheet } from './WaistSheet'
 import { WeightChart } from './WeightChart'
@@ -48,28 +50,13 @@ function Icon({ d, size = 14 }: { d: string; size?: number }) {
 }
 
 const byDate = (a: { date: IsoDate }, b: { date: IsoDate }) => (a.date < b.date ? -1 : 1)
-const dayOfWeekFormat = new Intl.DateTimeFormat('es-AR', {
-  weekday: 'short',
-  day: 'numeric',
-  timeZone: 'UTC',
-})
-
-/** "lun 1 – dom 7 feb", or "lun 26 ene – dom 1 feb" when the week spans two months */
-function weekRange(start: IsoDate): string {
-  const end = addDays(start, 6)
-  const from =
-    start.slice(5, 7) === end.slice(5, 7)
-      ? dayOfWeekFormat.format(new Date(`${start}T12:00:00Z`)).replace(/[.,]/g, '')
-      : shortDate(start)
-  return `${from} – ${shortDate(end)}`
-}
 
 // The pace bar goes from 0 to +0,6 kg a week.
 const PACE_SCALE = 0.6
 const pacePosition = (change: number) =>
   `${(Math.min(Math.max(change, 0), PACE_SCALE) / PACE_SCALE) * 100}%`
 const spoken = (change: number) =>
-  `${change < 0 ? 'menos' : 'más'} ${oneDecimal(Math.abs(change))} kilos`
+  `${change < 0 ? 'menos' : 'más'} ${formatKg(Math.abs(change))} kilos`
 
 function WeightCard({
   weights,
@@ -110,7 +97,7 @@ function WeightCard({
   const change = weekChange(weeks, week.start)
   const previous = weeks.find((w) => w.start === addDays(week.start, -7))
   const todayWeight = weights.find((w) => w.date === today)
-  const shownChange = change === null ? null : Number(change.toFixed(1))
+  const shownChange = change === null ? null : Number(change.toFixed(2))
 
   return (
     <section
@@ -128,7 +115,7 @@ function WeightCard({
         >
           {todayWeight ? (
             <>
-              Hoy <b className="font-num text-ink">{oneDecimal(todayWeight.kg)} kg</b>
+              Hoy <b className="font-num text-ink">{formatKg(todayWeight.kg)} kg</b>
               <span className="font-semibold text-accent">Editar</span>
             </>
           ) : (
@@ -139,9 +126,11 @@ function WeightCard({
 
       <div className="flex items-end justify-between gap-3">
         <div className="flex flex-col gap-0.5">
-          <span className="text-foot text-ink-3">Promedio {weekRange(week.start)}</span>
+          <span className="whitespace-nowrap text-foot text-ink-3">
+            Promedio {weekRange(week.start)}
+          </span>
           <span className="font-bold font-num text-[40px] leading-[44px] tracking-[-.02em]">
-            {oneDecimal(week.average)} <span className="text-body text-ink-3">kg</span>
+            {formatKg(week.average)} <span className="text-body text-ink-3">kg</span>
           </span>
           <span className="text-foot text-ink-3">{week.count} de 7 pesajes</span>
         </div>
@@ -154,10 +143,10 @@ function WeightCard({
                 {shownChange !== 0 && (
                   <span className="sr-only">{shownChange < 0 ? 'Bajaste ' : 'Subiste '}</span>
                 )}
-                {oneDecimal(Math.abs(shownChange))} kg
+                {formatKg(Math.abs(shownChange))} kg
               </span>
               <span className="text-foot text-ink-3">
-                vs semana anterior: <span className="font-num">{oneDecimal(previous.average)}</span>
+                vs semana anterior: <span className="font-num">{formatKg(previous.average)}</span>
               </span>
             </>
           ) : (
@@ -224,6 +213,13 @@ function WeightCard({
       </div>
 
       <WeightChart weights={weights} today={today} />
+      <Link
+        to="/body/weights"
+        className="-mx-4 -mb-2 flex h-11 items-center justify-between border-line border-t px-4 font-semibold text-accent text-body"
+      >
+        Ver todos los pesajes
+        <Icon d="m9 18 6-6-6-6" size={18} />
+      </Link>
     </section>
   )
 }

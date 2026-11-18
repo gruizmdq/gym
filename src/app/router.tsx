@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router'
 import { SignInPage } from '../features/account/SignInPage'
 import { BodyPage } from '../features/body/BodyPage'
+import { WeighingsPage } from '../features/body/WeighingsPage'
 import { ExercisePage } from '../features/exercise/ExercisePage'
 import { ExerciseHistoryPage } from '../features/history/ExerciseHistoryPage'
 import { HistoryPage } from '../features/history/HistoryPage'
@@ -32,6 +33,8 @@ export const router = createBrowserRouter([
     ],
   },
   { path: '/summary/:id', Component: SummaryPage },
+  // Every weighing, by week: full screen, opened from Cuerpo.
+  { path: '/body/weights', Component: WeighingsPage },
   // One exercise's history is full screen, like the summary: no tab bar.
   { path: '/history/exercise/:exerciseId', Component: ExerciseHistoryPage },
   // The whole routine, one day at a time: full screen, opened from Today's rotation.

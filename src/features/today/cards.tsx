@@ -4,9 +4,9 @@ import type { Weight } from '../../data/db'
 import { addDays, type IsoDate } from '../../domain/dates'
 import { TECHNIQUE_LABEL } from '../../domain/prescription'
 import { routine } from '../../routine/routine'
-import { duration, longDate, range, rir } from '../../ui/format'
+import { duration, formatKg, longDate, range, rir } from '../../ui/format'
 import { BodyIcon } from '../../ui/icons'
-import { mediumButton, oneDecimal } from '../body/parts'
+import { mediumButton } from '../body/parts'
 import { abbreviation, type Training } from '../training/state'
 
 const tick = (
@@ -202,7 +202,7 @@ export function WeightCard({
           <span className="text-foot text-ink-3">
             {shown ? (
               <>
-                {shown.label}: <span className="font-num">{oneDecimal(shown.kg)}</span> kg
+                {shown.label}: <span className="font-num">{formatKg(shown.kg)}</span> kg
               </>
             ) : (
               'Todavía no te pesaste hoy'
