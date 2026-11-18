@@ -42,7 +42,18 @@ pará y preguntá.
   `decisiones.md`, Pendiente). Sin tablas nuevas.
 - **Mac (rama `desktop-layout`, sale de `fase-7`):** en pantallas anchas la app es una columna
   de 402 px centrada, las hojas son modales y hay hover con mouse. En el iPhone no cambia nada.
+- **Fase 8 (rama `fase-8`):** aviso de fin de descanso por push. La app le dice al Worker qué
+  aviso tiene que tener cada dispositivo; un Durable Object por dispositivo lo programa con una
+  alarma y manda el Web Push (cifrado y VAPID propios, con Web Crypto). Se activa en Ajustes.
+  Sin tablas nuevas. Probado con tests, `curl` y `wrangler dev` contra Supabase local (la alarma
+  llega a FCM). El secreto `VAPID_PRIVATE_KEY` ya está en Cloudflare (15/11/2026). **Falta
+  probarlo en el iPhone** (el navegador integrado de la app de Claude no tiene service worker
+  ni notificaciones).
 - **Datos cargados por SQL:** 273 pesajes históricos (11/10/2025 al 15/11/2026), el 15/11/2026.
+- **Rutina completa (rama `routine-view`):** `/routine/:day` muestra todos los días del plan, de
+  a uno, con la ficha de prescripción de cada ejercicio. Se entra desde los días de la rotación
+  en Hoy o desde "Ver la rutina completa". Arranca en el plan y la semana actuales; se puede ver
+  el otro plan y cualquier semana del mesociclo (`?plan=4d&week=5`). Solo lee.
 
 ## Plan por fases
 | Fase | Contenido | Lista cuando |
@@ -68,9 +79,14 @@ Actions · Biome · Vitest + Playwright (WebKit).
 - `npm run verify`: lint (Biome) + tests (Vitest) + build (`tsc -b` + Vite) + bundle del
   Worker (`wrangler deploy --dry-run`). Es exactamente lo que corren CI y el deploy: si pasa
   local, pasa allá.
-- `npx wrangler dev` (:8787): el Worker con el MCP remoto. `.dev.vars` (no se commitea) lo
-  apunta al Supabase local. Después de tocar `wrangler.jsonc`:
-  `npx wrangler types worker/worker-configuration.d.ts`.
+- `npx wrangler dev` (:8787): el Worker con el MCP remoto y el push, sirviendo `dist/` (hacé
+  `npm run build` antes). `.dev.vars` (no se commitea) lo apunta al Supabase local y tiene un
+  `VAPID_PRIVATE_KEY` propio de local, par del `VITE_VAPID_PUBLIC_KEY` de `.env.local`. Después
+  de tocar `wrangler.jsonc`: `npx wrangler types worker/worker-configuration.d.ts` (y Biome
+  sobre la salida: el archivo está fuera de `biome.json`).
+- Par VAPID nuevo (para local o para cambiar el de producción); imprime la clave pública y el
+  JWK privado:
+  `node -e "crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign']).then(async k=>console.log(Buffer.from(await crypto.subtle.exportKey('raw',k.publicKey)).toString('base64url'),JSON.stringify(await crypto.subtle.exportKey('jwk',k.privateKey))))"`
 - `npm run format`: Biome con `--write`. Biome no toca los `.md`.
 - `npm run icons`: regenera íconos y splash desde `public/icon.svg`
   (`pwa-assets.config.ts`). El generador imprime links con `-light-` en el nombre, pero los
@@ -84,9 +100,16 @@ Actions · Biome · Vitest + Playwright (WebKit).
   pasa, `npx wrangler deploy`. No hay tokens de Cloudflare en GitHub.
 - GitHub Actions corre `npm run verify` en cada PR y en `main`.
 - `public/_headers`: `/assets/*` inmutable; `sw.js` e `index.html` sin caché.
-- **El Worker (`worker/`) solo atiende `/mcp`, `/authorize`, `/token`, `/register` y
-  `/.well-known/*`** (`run_worker_first`); el resto son los archivos de la app. OAuth guarda
-  clientes y grants en el KV `OAUTH_KV`, que `wrangler deploy` crea solo la primera vez.
+- **El Worker (`worker/`) solo atiende `/mcp`, `/authorize`, `/token`, `/register`,
+  `/.well-known/*` y `/push/*`** (`run_worker_first`); el resto son los archivos de la app.
+  OAuth guarda clientes y grants en el KV `OAUTH_KV`, que `wrangler deploy` crea solo la
+  primera vez. Las alarmas del descanso viven en el Durable Object `RestAlarm` (SQLite,
+  declarado en `exports`: no se vuelve a `migrations`).
+- **Secreto del Worker `VAPID_PRIVATE_KEY`:** la clave privada del push (un JWK), par de
+  `VITE_VAPID_PUBLIC_KEY` en `.env`. Se carga una vez, en el dashboard (Workers › gym ›
+  Settings › Variables and Secrets) o con `npx wrangler secret put VAPID_PRIVATE_KEY`. Sin él,
+  `/push/rest` responde 503 y el aviso no se puede activar. Cambiar el par obliga a cambiar los
+  dos y a volver a activar el aviso en cada dispositivo.
 - **Conectar Claude:** en los conectores de Claude (claude.ai o la app), agregar un conector
   personalizado con `https://gym.<subdominio>.workers.dev/mcp`. Pide el email y la contraseña
   de la app.
@@ -127,13 +150,18 @@ src/data/            Dexie: db.ts (tablas), actions.ts (toda escritura), queries
 src/features/<x>/    pantallas; training/state.ts junta dominio + datos para Hoy, sesión y Ajustes
 src/ui/              piezas sin dominio: Page, Sheet (<dialog>), TabBar, format, buttons
 src/pwa/             service worker (se registra desde main.tsx, fuera del router) y almacenamiento
+src/push/            el aviso de fin de descanso: device.ts (permiso, suscripción, pedido al Worker),
+                     start.ts (mira la sesión en Dexie y le dice al Worker qué aviso va)
+public/push-sw.js    push y toque de la notificación; lo importa el service worker generado
 src/sync/            el único que habla con Supabase: tables.ts (mapeo), engine.ts (subir, bajar,
                      resolver), start.ts (cuándo corre, login), status.ts (lo que ve la UI)
 src/features/session/model.ts   cada slot de la sesión en curso: ejercicio elegido, unidad, firma, progreso
 src/features/exercise/          la pantalla central: filas, panel inferior y hojas de opciones
 worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), authorize.ts (login),
                      mcp.ts (tools), report.ts y writes.ts (puros, con tests), supabase.ts y
-                     data.ts (Supabase como Gonza). Reusa src/domain, la rutina y sync/tables.ts
+                     data.ts (Supabase como Gonza). Reusa src/domain, la rutina y sync/tables.ts.
+                     El push: push.ts (ruta), restAlarm.ts (Durable Object), rest.ts y
+                     webpush.ts (puros, con tests: RFC 8291 y 8292)
 ```
 - Para probar en el navegador sin ensuciar la rotación, descartá la sesión en vez de
   terminarla. Antes del 7/12, terminar una sesión corre el inicio del mesociclo 1 a ese
@@ -143,6 +171,8 @@ worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), author
 - **La UI solo habla con Dexie. El único que habla con Supabase es el sync.** Nada de
   fetch a Supabase desde una pantalla. Fuera de la app, el MCP remoto habla con Supabase
   **como Gonza**: su sesión va cifrada en el grant de OAuth y aplica RLS. Nunca `service_role`.
+  El push del descanso también mira Dexie: las pantallas solo escriben el descanso y
+  `src/push/` le avisa al Worker (no a Supabase), con el token de la sesión del sync.
 - **Cada toque se escribe en Dexie al instante.** iOS puede matar la app en cualquier
   momento; no hay estado importante que viva solo en memoria (tampoco el descanso: se
   guarda como timestamp de fin).
@@ -226,7 +256,22 @@ worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), author
   - Solo series efectivas: las de aproximación no se anotan.
   - Terminar con ejercicios pendientes cuenta como hecha para la rotación; los que faltaron
     quedan como salteados. Una sesión recién empezada se puede descartar.
-  - El fin del descanso es solo visual: el panel cambia de color y cuenta el tiempo de más.
+  - En la app, el fin del descanso es solo visual: el panel cambia de color y cuenta el
+    tiempo de más. Además puede llegar un push (abajo).
+- **Aviso de fin de descanso (push):**
+  - Se activa y se apaga por dispositivo, solo en Ajustes › Entrenamiento. Hace falta la app
+    instalada en inicio y haber entrado con la cuenta; el permiso se pide al tocar.
+  - Hay aviso con una sesión en curso, no cargada después, con un descanso que todavía no
+    terminó. Sale a la hora de fin; si cambia el descanso (+15 s, −15 s, otra serie) o lo que
+    sigue, se reprograma; si se saltea o se termina o descarta la sesión, se cancela.
+  - Empezar la serie siguiente sin tocar Saltar no lo cancela: el descanso sigue corriendo.
+  - "Terminó el descanso" y abajo "Sigue Prensa · serie 3 de 3" (al ejercicio le quedan
+    series), "Sigue <el siguiente con series>" o "Terminaste todos los ejercicios".
+  - Llega aunque la app esté a la vista. Al volver a la app se borran las del descanso. Al
+    tocarla vuelve a la app donde estaba; si iOS la cerró, abre el ejercicio del descanso.
+  - Un solo aviso por descanso. Si el push service no lo entrega en 60 s, se pierde.
+  - Sin señal no se programa; se manda el estado actual al abrir la app, al volver a primer
+    plano y al recuperar señal. Cada dispositivo con el aviso prendido avisa los descansos que ve.
 - **Carga tardía:** se puede cargar una sesión con fecha pasada. El día se sugiere según
   la rotación a esa fecha. "Hoy toca" y la semana del mesociclo se recalculan con la fecha
   de cada sesión. En la carga no hay descanso ni Wake Lock.
@@ -278,8 +323,16 @@ worker/              el MCP remoto (Cloudflare Worker): index.ts (OAuth), author
 ## Trampas de iOS (PWA instalada)
 - **No hay Background Sync.** El sync corre al abrir la app, en `visibilitychange`, en
   `online`, unos segundos después de cada escritura y al terminar la sesión.
-- **No hay notificaciones locales programadas.** El aviso de fin de descanso por push
-  necesita un server (fase 8).
+- **No hay notificaciones locales programadas.** El aviso de fin de descanso necesita un
+  server: lo programa el Worker con una alarma de Durable Object.
+- **Cada push tiene que mostrar una notificación.** Si uno llega y no se ve nada, iOS revoca la
+  suscripción. Por eso no se puede "cancelar con un push" ni callar el aviso con la app a la
+  vista: se cancela en el server. El mensaje es declarativo (`web_push: 8030`, iOS 18.4+): iOS
+  lo muestra aunque el service worker no corra; `mutable` se lo pasa igual al service worker.
+- **El permiso de notificaciones solo se pide dentro de un toque**, con la app instalada en
+  inicio: `Notification.requestPermission()` va antes de cualquier `await`.
+- **El navegador integrado de la app de Claude no tiene service worker ni notificaciones:** el
+  push se prueba en Chrome (localhost) o en el iPhone.
 - **Borrar el ícono de inicio borra IndexedDB.** Pedir `navigator.storage.persist()`.
   Supabase es el backup.
 - **Cambiar de dominio es una instalación nueva** (otro origen, otro almacenamiento).

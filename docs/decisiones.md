@@ -47,7 +47,7 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 19 | **Teclado nativo (`inputmode`) al tocar el número** | Es lo pedido. Si en el gimnasio se siente torpe, se evalúa un teclado propio después de la fase 3. | Teclado numérico propio desde el principio. | medio |
 | 20 | **Tab bar flotante con 4 secciones: Hoy, Historial, Cuerpo, Ajustes** | Acompaña el lenguaje de iOS 26. En la sesión activa no hay tab bar: es pantalla completa. | Tab bar pegada al borde. | barato |
 | 21 | **"Cadencia ok" viene marcada; un toque la desmarca** | Cansado, es fácil olvidarse de marcarla, y eso bloquearía las sugerencias de progresión. Aprobado con los lienzos. | Desmarcada por defecto. | barato |
-| 22 | **Fin del descanso solo visual** | Decisión de Gonza. Safari no vibra y el sonido depende del modo silencio. | Pitido corto + visual. | barato |
+| 22 | **Fin del descanso solo visual en la app** (desde la fase 8 se suma un push opcional, decisión 78) | Decisión de Gonza. Safari no vibra y el sonido depende del modo silencio. El push lo suena iOS, con sus reglas de silencio y Concentración. | Pitido corto + visual. | barato |
 
 ## Después de los lienzos (14/11/2026)
 
@@ -149,13 +149,39 @@ Formato: **decisión** · por qué · alternativa descartada · costo de reverti
 | 76 | **Desde `sm` las hojas son un modal centrado; se cierran con Esc o con un clic afuera** | Decisión de Gonza: es lo esperable con mouse. Solo cierra un clic que empieza y termina afuera, no una selección de texto que se suelta ahí. En el iPhone siguen siendo hojas inferiores y un toque afuera no las cierra. | Hoja inferior del ancho de la columna. | barato |
 | 77 | **Hover y manito solo con mouse (`hover: hover`), con una regla global en `index.css`; sin atajos de teclado** | Decisión de Gonza. Una regla cubre botones, links y filas con control nativo, sin acordarse en cada componente. En el iPhone no aplica. | Enter para completar la serie y Esc para volver: más código y riesgo de dispararse con el teclado del iPhone. `hover:` en cada componente. | barato |
 
-## Después de la fase 7 (15/11/2026)
+## Fase 8 (15/11/2026)
 
 | # | Decisión | Por qué | Descartado | Revertir |
 |---|---|---|---|---|
-| 75 | **La siembra del mesociclo 1 va con `updatedAt: 0`** | Una base nueva (reinstalar) lo sembraba con la hora actual y en el primer sync pisaba el inicio guardado en el servidor: volvía al 7/12. Como versión más vieja posible, el trigger ignora su push y el pull trae la del servidor. | Bajar antes de subir en el primer sync: toca el motor para un solo caso. | barato |
+| 78 | **Aviso de fin de descanso por push, opcional y por dispositivo; se activa solo en Ajustes** | Decisión de Gonza: con el teléfono bloqueado lo visual no se ve. iOS pide el permiso solo tras un toque, y Ajustes es un lugar fijo para prenderlo y apagarlo. | Ofrecerlo además en el panel del primer descanso: un elemento más en el panel. | barato |
+| 79 | **Alarma de Durable Object, uno por dispositivo (usuario + suscripción)** | Entra en el plan gratis (SQLite). Una sola alarma por objeto: `setAlarm` la reemplaza (+15 s) y `deleteAlarm` la cancela (Saltar, terminar). Cada `setAlarm` es una escritura: una sesión usa unas 50 de las 100.000 diarias. | Colas con demora: no se pueden cancelar. Cron: de a un minuto. `pg_cron` en Supabase: sondear cada pocos segundos todo el día. | medio |
+| 80 | **La app le dice al Worker qué aviso tiene que tener el dispositivo, mirando la sesión en Dexie; sin tablas ni sync** | Las pantallas no cambian: escriben el descanso como antes y `src/push/` reacciona. Mandar el estado deseado (no "sumá 15 s") hace que reintentar sea seguro. Un pedido a la vez, en orden. | Tabla de suscripciones en Supabase (Dexie v7, migración, mapeo): más piezas para un dato de un solo dispositivo. Webhook de Supabase al cambiar la sesión: depende del sync (3 s de demora) y de un secreto en la base. | barato |
+| 81 | **El Worker verifica el token de Supabase de la app (`getClaims`)** | Decisión de Gonza. Es el mismo login del sync: nadie más puede usar el Worker para mandar pushes con nuestra clave. Con claves asimétricas verifica sin preguntarle a Supabase. | Sin login: la URL de la suscripción como único secreto. | barato |
+| 82 | **Web Push propio con Web Crypto: cifrado RFC 8291 (`aes128gcm`) y VAPID RFC 8292** | Son unas 150 líneas, probadas byte por byte contra el ejemplo del RFC. La librería para Workers que se iba a usar (PushForge) dice RFC 8291 pero cifra con el borrador viejo `aesgcm`, que los navegadores no están obligados a aceptar. | PushForge; `web-push` (usa el crypto de Node, no anda en Workers). | barato |
+| 83 | **Mensaje declarativo (`web_push: 8030`) con `mutable`** | iOS 18.4+ lo muestra aunque el service worker no corra, sin penalidad de push silencioso. `mutable` se lo pasa al service worker, que lo muestra con un toque que vuelve a la app donde estaba; en Chrome y la Mac es el camino de siempre. | Push clásico: si el service worker falla, iOS revoca la suscripción. Declarativo sin `mutable`: el toque recarga la app en el ejercicio del descanso. | barato |
+| 84 | **El aviso llega aunque la app esté a la vista; al volver se borran los del descanso** | Decisión de Gonza. iOS obliga a mostrar cada push. | Cancelarlo con la app a la vista y reprogramarlo al ocultarse: si iOS congela la app antes del pedido, al bloquear el teléfono no llega. | barato |
+| 85 | **Un solo aviso por descanso; vence a los 60 s** (TTL y alarma tarde) | Decisión de Gonza. Tarde, un "Terminó el descanso" llega fuera de lugar. | Un recordatorio al minuto de más. | barato |
+| 86 | **"Terminó el descanso · Sigue Prensa · serie 3 de 3"**; al tocarlo, la app donde estaba | Decisión de Gonza. Sale de los mismos slots que la pantalla de la sesión. | Solo el título. Peso y reps de la serie: el prellenado vive en la pantalla del ejercicio. Abrir siempre el ejercicio que sigue. | barato |
+| 87 | **Cada dispositivo con el aviso prendido avisa los descansos que ve** | Decisión de Gonza. En la práctica avisa el que se usa para entrenar: el otro ve el descanso recién cuando sincroniza. | Solo el dispositivo donde empezó el descanso: un dato más en la sesión. | barato |
+
+## Rutina completa (16/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 88 | **Se entra desde Hoy: los días de la rotación abren su rutina, más un link "Ver la rutina completa"** | Decisión de Gonza. No suma una pestaña a la barra (decisión 20). | Una sección en Ajustes; una quinta pestaña. | barato |
+| 89 | **Muestra la semana y el plan actuales, con selectores para cualquier semana del mesociclo y para el otro plan** | Decisión de Gonza. Ver la semana que viene (o la descarga) sirve para planificar. El mesociclo queda fijo: decide el principal de Lower A. | Solo la semana actual; la rutina base sin ajustar por semana. | barato |
+| 90 | **Cada ejercicio con la misma ficha de prescripción que la pantalla del ejercicio** (`PrescriptionCard`, ahora compartida), más el lado que va primero, la alternancia por mesociclo y las alternativas | Decisión de Gonza. Una sola ficha: lo que se ve en la rutina es lo que se ve al entrenar. | Una lista compacta como la de Hoy. | barato |
+
+## Mesociclo al reinstalar (15/11/2026)
+
+| # | Decisión | Por qué | Descartado | Revertir |
+|---|---|---|---|---|
+| 91 | **La siembra del mesociclo 1 va con `updatedAt: 0`** | Una base nueva (reinstalar) lo sembraba con la hora actual y en el primer sync pisaba el inicio guardado en el servidor: volvía al 7/12. Como versión más vieja posible, el trigger ignora su push y el pull trae la del servidor. | Bajar antes de subir en el primer sync: toca el motor para un solo caso. | barato |
 
 ## Pendiente
+- **Fase 8, probar en el iPhone** (el secreto `VAPID_PRIVATE_KEY` ya está cargado): activar en
+  Ajustes, bloquear el teléfono durante un descanso, +15 s, Saltar, la app a la vista, el
+  toque, y modo avión al arrancar el descanso.
 - **Import de Hevy (fase 7), en pausa:** falta el `workouts.csv` real de Gonza; no hay
   documentación oficial de las columnas. Ya decidido: los ejercicios de Hevy que no están en
   el catálogo se agregan a `routine.json` como ejercicios sin slot, con id estable. Si el
